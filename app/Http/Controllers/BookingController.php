@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
+    /**
+     * Retrieve all bookings for the authenticated user.
+     * Students see bookings where they are the student.
+     * Advisers see bookings where they are the adviser.
+     * Results are ordered by preferred_datetime in descending order.
+     */
     public function index()
     {
         $user = Auth::user();
@@ -30,12 +36,21 @@ class BookingController extends Controller
         return view('bookings.index', compact('bookings'));
     }
 
+    /**
+     * Display the form to create a new booking.
+     * Retrieves all available expertise areas for selection.
+     */
     public function create()
     {
         $expertiseList = Expertise::all();
         return view('bookings.create', compact('expertiseList'));
     }
 
+    /**
+     * Store a newly created booking in the database.
+     * Validates input, finds an available adviser with the selected expertise,
+     * creates the booking with pending status, and notifies both student and adviser.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -86,6 +101,11 @@ class BookingController extends Controller
         return redirect()->route('bookings.show', $booking)->with('success', 'Booking request submitted successfully!');
     }
 
+    /**
+     * Display a specific booking with full details.
+     * Only the student, adviser, or admin can view the booking.
+     * Aborts with 403 if unauthorized.
+     */
     public function show(Booking $booking)
     {
         $user = Auth::user();
@@ -97,6 +117,11 @@ class BookingController extends Controller
         return view('bookings.show', compact('booking'));
     }
 
+    /**
+     * Confirm a pending booking (adviser only).
+     * Updates booking status to 'confirmed' and sets a 90-day scheduled deletion date.
+     * Sends confirmation notification to the student.
+     */
     public function confirm(Booking $booking)
     {
         $user = Auth::user();
@@ -122,6 +147,11 @@ class BookingController extends Controller
         return back()->with('success', 'Booking confirmed successfully!');
     }
 
+    /**
+     * Deny a pending booking with optional notes (adviser only).
+     * Updates booking status to 'denied' and stores adviser notes.
+     * Sends denial notification to the student with the reason.
+     */
     public function deny(Request $request, Booking $booking)
     {
         $user = Auth::user();
@@ -150,6 +180,10 @@ class BookingController extends Controller
         return back()->with('success', 'Booking denied.');
     }
 
+    /**
+     * Cancel a booking (student or adviser only).
+     * Updates booking status to 'cancelled' and notifies the other party (student or adviser).
+     */
     public function cancel(Booking $booking)
     {
         $user = Auth::user();

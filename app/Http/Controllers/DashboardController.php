@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    /**
+     * Display the student dashboard.
+     * Shows upcoming and recent bookings, recent notifications, and booking statistics.
+     * Stats include total, pending, confirmed, and completed bookings.
+     */
     public function student()
     {
         $user = Auth::user();
@@ -40,6 +45,11 @@ class DashboardController extends Controller
         return view('dashboards.student', compact('upcomingBookings', 'recentBookings', 'notifications', 'stats'));
     }
 
+    /**
+     * Display the adviser dashboard.
+     * Shows pending booking requests, upcoming confirmed bookings, recent notifications,
+     * and booking statistics (total, pending, confirmed, completed).
+     */
     public function adviser()
     {
         $user = Auth::user();
@@ -71,6 +81,11 @@ class DashboardController extends Controller
         return view('dashboards.adviser', compact('pendingBookings', 'upcomingBookings', 'notifications', 'stats'));
     }
 
+    /**
+     * Display the admin dashboard.
+     * Shows system-wide statistics including total bookings, total users,
+     * pending and confirmed booking counts, and the 10 most recent bookings.
+     */
     public function admin()
     {
         $totalBookings = Booking::count();

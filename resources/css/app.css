@@ -53,6 +53,20 @@
     margin-top: 14px;
     margin-bottom: 14px;
 }
+/* =========================
+   tr, th, td
+   - Table row and cell styling for booking requests table
+   ========================= */
+tr {
+    border-bottom: 2px solid #ccc;
+}
+th {
+    padding: 14px;
+    text-align: left;
+}
+td {
+    padding: 14px;
+}
 
 /* =========================
    Page Shell
@@ -61,9 +75,29 @@
 .welcome-body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #87CEEB 0%, #98D8C8 100%);
-    min-height: 900px;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* =========================
+   Notification Page 
+   ========================= */
+.div-mark-read {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+.div-notifications-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    margin-bottom: 14px;
+    border-left: 4px solid #667eea;
+    border-radius: 5px;
 }
 
 /* =========================
@@ -99,6 +133,13 @@
     font-weight: bold;
 }
 
+.span-status-adviser {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 .div-info{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -113,6 +154,34 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+/* =========================
+   Adviser dashboard 
+   ========================= */
+
+    .div-recent-notifications{
+     padding: 14px;
+     margin-bottom: 14px;
+     border-left-width: 4px;
+     border-left-style: solid;
+     background: #e6e6e6;
+     border-radius: 5px;
+}
+
+.div-mybookings{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.span-status-adviser{
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
 
 /* =========================
    Navbar
@@ -215,6 +284,9 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .page-content {
@@ -337,6 +409,7 @@
     text-align: center;
     color: #666;
     box-shadow: 0 2px 10px black;
+    margin-top: auto;
 }
 
 /* =========================
