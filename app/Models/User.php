@@ -14,8 +14,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     *
-     * @var list<string>
+     * Copilot generated fillable attributes based on the users table and Microsoft OAuth fields
      */
     protected $fillable = [
         'name',
@@ -24,6 +23,9 @@ class User extends Authenticatable
         'role',
         'student_id',
         'phone',
+        'microsoft_token',
+        'microsoft_refresh_token',
+        'microsoft_token_expires_at',
     ];
 
     /**
@@ -46,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'microsoft_token_expires_at' => 'datetime',
         ];
     }
 
@@ -89,5 +92,11 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+    //Copilot generated method to check if user has valid Microsoft token
+
+    public function hasMicrosoftToken()
+    {
+        return $this->microsoft_token && $this->microsoft_token_expires_at && $this->microsoft_token_expires_at->isFuture();
     }
 }

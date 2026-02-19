@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\MicrosoftAuthController;
 
 // Landing page
 Route::get('/', function () {
@@ -64,3 +65,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
+// Microsoft OAuth Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/microsoft/connect', [MicrosoftAuthController::class, 'redirectToMicrosoft'])->name('microsoft.redirect');
+    Route::get('/microsoft/disconnect', [MicrosoftAuthController::class, 'disconnect'])->name('microsoft.disconnect');
+});
+
+Route::get('/auth/callback', [MicrosoftAuthController::class, 'handleCallback'])->name('microsoft.callback');
