@@ -4,6 +4,33 @@
     <p class="text-gray-600 mt-2">Studies Adviser Dashboard</p>
 </div>
 
+<!-- Microsoft Calendar Connection -->
+<div class="card" style="border-left: 4px solid #0078d4;">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 style="margin: 0;">Microsoft Outlook Calendar</h3>
+            <p class="text-gray-600 mt-2">
+                @if(Auth::user()->hasMicrosoftToken())
+                    <span style="color: #107c10; font-weight: 600;">✓ Connected</span>
+                    <p class="text-sm text-gray-500 mt-1">Your bookings will automatically sync to Outlook</p>
+                @else
+                    <span style="color: #d83b01;">Not Connected</span>
+                    <p class="text-sm text-gray-500 mt-1">Connect your Outlook calendar to sync bookings automatically</p>
+                @endif
+            </p>
+        </div>
+        <div>
+            @if(Auth::user()->hasMicrosoftToken())
+                <a href="{{ route('microsoft.disconnect') }}" class="text-red-600 hover:text-red-800">Disconnect</a>
+            @else
+                <a href="{{ route('microsoft.redirect') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Connect Outlook
+                </a>
+            @endif
+        </div>
+    </div>
+</div>
+
 <div class="grid-cards">
     <div class="card card-colour1">
         <h3>Total Bookings</h3>
