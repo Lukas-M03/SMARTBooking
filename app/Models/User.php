@@ -97,6 +97,10 @@ class User extends Authenticatable
 
     public function hasMicrosoftToken()
     {
-        return $this->microsoft_token && $this->microsoft_token_expires_at && $this->microsoft_token_expires_at->isFuture();
+        try {
+            return $this->microsoft_token && $this->microsoft_token_expires_at && $this->microsoft_token_expires_at->isFuture();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
