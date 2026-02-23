@@ -1,59 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+**Install PHP**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+You can install PHP 8.4 (thread-safe zip file version) which can be downloaded from
 
-## About Laravel
+https://windows.php.net/download/#php-8.4-ts-vs16-x64 or
+https://windows.php.net/download/#php-8.4-ts-vs17-x64
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Once downloaded, right click the zip file, select 'Extract all' option and unzip the file in a
+folder named c:\php , then add this folder to your user PATH variable. [NOTE: To update to
+a later version of PHP, simply download the new version and extract the new zip file
+contents to c:\php). Open a new terminal window and verify that its installed correctly by
+typing:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+c:> php -v
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+If you get an error it may be that the PATH variable has not been set up correctly- 
 
-## Learning Laravel
+Go to 'Edit environment variables for your account' through the windows search
+Go onto 'Path' and press 'edit', click 'new' and add this path %USERPROFILE%\AppData\Roaming\Composer\vendor\bin 
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+We now need to create a configuration file by opening the terminal and in the c:\php folder execute following command-
+C:\php> copy .\php.ini-development php.ini
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Next we need to enable some php extensions required by Laravel. Open the php.ini file in
+notepad and update the extensions section by removing the leading ';' comment character
+from start of lines shown below. This will enable a range of both required and useful
+extensions for Laravel development-
 
-## Laravel Sponsors
+Laravel Extensions enabled
+extension=curl
+extension=fileinfo
+extension=gd
+extension=gettext
+extension=intl
+extension=mbstring
+extension=exif
+extension=openssl
+extension=pdo_mysql
+extension=pdo_pgsql
+extension=pdo_sqlite
+extension=zip
+zend_extension=opcache
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Save the file changes and close Notepad.
 
-### Premium Partners
+**Install Composer**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Composer is the PHP Dependency Manager and is required to use Laravel. To install
+composer, download and execute the setup file found at following url
 
-## Contributing
+https://getcomposer.org/Composer-Setup.exe.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Again to check composer is installed correctly open a terminal and type-
 
-## Code of Conduct
+c:> composer about
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Install PHP/Laravel Extensions **
 
-## Security Vulnerabilities
+To simplify this create a Powershell script (this only works in Windows Powershell) using code 
+below to create a PHP profile in VSCode and install the necessary extensions).
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Script for batch installing Visual Studio Code extensions
+# Specify extensions to be checked & installed by modifying $extensions
+$profile = "Laravel"
+$extensions = @("formulahendry.auto-close-tag",
+  "formulahendry.auto-rename-tag",
+  "laravel.vscode-laravel",
+  "bmewburn.vscode-intelephense-client",
+  "mehedidracula.php-namespace-resolver",
+  "liamhammett.temphpest",
+  "bradlc.vscode-tailwindcss",
+  "shufo.vscode-blade-formatter",
+  "onecentlin.laravel-blade",
+  "pkief.material-icon-theme")
+$cmd = "code --list-extensions"
+Invoke-Expression $cmd -OutVariable output | Out-Null
+$installed = $output -split "\s"
+code --profile $profile
+$confirm = Read-Host "Enter y to confirm installation:"
+if ($confirm -eq "Y" -or $confirm -eq "y") {
+  foreach ($ext in $extensions) {
+  if ($installed.Contains($ext)) {
+  Write-Host $ext "already installed." -ForegroundColor Gray
+  } else {
+  Write-Host "Installing" $ext "..." -ForegroundColor White
+  code --profile $profile --install-extension $ext --force
+  }
+  }
+  Write-Host "Extensions installed.."
+} else {
+  Write-Host "Extensions not installed.."
+}
 
-## License
+Copy the code above to a file named com621.ps1 in your Documents folder and open a 
+powershell terminal in this folder and execute the script.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+c:> .\com621.ps1
+
+The script will open vscode then wait for you to press 'y' in the terminal to confirm
+installation. Once completed you can open your project in vs-code, then select the PHP
+profile to have full PHP/Laravel support.
