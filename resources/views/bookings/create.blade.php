@@ -16,8 +16,22 @@
                     @endforeach
                 </x-form.select>
                 <x-form.error name="expertise_id" />
-                <small class=" text-gray-500 display-block mt-10px">
-                    You will be automatically matched with an adviser who specializes in this area.
+            </div>
+
+            <div class="form-group">
+                <x-form.label for="adviser_id">Choose Adviser</x-form.label>
+                <x-form.select id="adviser_id" name="adviser_id" required>
+                    <option value="">Select an adviser</option>
+                    @foreach ($advisers as $adviser)
+                        <option value="{{ $adviser->id }}"
+                            {{ old('adviser_id') == $adviser->id ? 'selected' : '' }}>
+                            {{ $adviser->name }}
+                        </option>
+                    @endforeach
+                </x-form.select>
+                <x-form.error name="adviser_id" />
+                <small class="text-gray-500 display-block mt-10px">
+                    Only advisers who match your selected expertise can be booked.
                 </small>
             </div>
 

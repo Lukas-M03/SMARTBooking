@@ -43,7 +43,12 @@ class BookingController extends Controller
     public function create()
     {
         $expertiseList = Expertise::all();
-        return view('bookings.create', compact('expertiseList'));
+        $advisers = User::with('expertise')
+            ->where('role', 'adviser')
+            ->orderBy('name')
+            ->get();
+
+        return view('bookings.create', compact('expertiseList', 'advisers'));
     }
 
     /**
@@ -55,20 +60,24 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'expertise_id' => ['required', 'exists:expertise,id'],
+            'adviser_id' => ['required', 'exists:users,id'],
             'topic' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'preferred_datetime' => ['required', 'date', 'after:now'],
             'meeting_type' => ['required', 'in:in-person,online,phone'],
         ]);
 
-        $adviser = User::where('role', 'adviser')
+        $adviser = User::where('id', $validated['adviser_id'])
+            ->where('role', 'adviser')
             ->whereHas('expertise', function ($query) use ($validated) {
                 $query->where('expertise.id', $validated['expertise_id']);
             })
             ->first();
 
         if (!$adviser) {
-            return back()->with('error', 'No adviser available for the selected expertise.');
+            return back()
+                ->withInput()
+                ->withErrors(['adviser_id' => 'Selected adviser does not offer the chosen expertise.']);
         }
 
         $booking = Booking::create([

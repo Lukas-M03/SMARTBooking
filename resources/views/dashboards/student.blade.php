@@ -50,6 +50,14 @@
     </div>
 </div>
 
+<div class="card calendar-card">
+    <div class="calendar-header">
+        <h3>Adviser Availability + Your Bookings</h3>
+        <p class="text-gray-600 mt-2">Busy times are shaded and cannot be booked.</p>
+    </div>
+    <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
+</div>
+
 @include('bookingsView.studentBooking')
 @include('notifications.studentNotification')
 

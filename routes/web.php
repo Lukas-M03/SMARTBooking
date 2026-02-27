@@ -6,6 +6,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\MicrosoftAuthController;
+use App\Http\Controllers\CalendarController;
 
 // Landing page
 Route::get('/', function () {
@@ -73,3 +74,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/auth/callback', [MicrosoftAuthController::class, 'handleCallback'])->name('microsoft.callback');
+
+// Calendar API
+Route::middleware(['auth'])->group(function () {
+    Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
+});

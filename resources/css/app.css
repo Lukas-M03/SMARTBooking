@@ -111,6 +111,40 @@ td {
     margin-bottom: 25px;
 }
 
+.calendar-card {
+    margin-bottom: 25px;
+}
+
+.calendar-header {
+    margin-bottom: 12px;
+}
+
+.booking-calendar {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.booking-calendar .fc-toolbar-title {
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.booking-calendar .fc-button {
+    background: #1f2937;
+    border-color: #1f2937;
+}
+
+.booking-calendar .fc-button:hover {
+    background: #111827;
+    border-color: #111827;
+}
+
+.booking-calendar .fc-daygrid-day-number {
+    color: #1f2937;
+}
+
 .div-notifications{
     padding: 14px;
     margin-bottom: 14px;
