@@ -13,6 +13,7 @@ class MicrosoftGraphService
 {
     private Client $httpClient;
     private string $token;
+    private User $user;
     private const GRAPH_API_URL = 'https://graph.microsoft.com/v1.0';
 
     public function __construct(User $user)
@@ -21,8 +22,72 @@ class MicrosoftGraphService
             throw new \Exception('User has no Microsoft Graph token. Please authenticate first.');
         }
 
+        $this->user = $user;
         $this->token = $user->microsoft_token;
         $this->httpClient = new Client();
+        
+        // Refresh token if it's about to expire
+        $this->ensureTokenIsValid();
+    }
+
+    /**
+     * Ensure the token is valid and refresh if needed
+     */
+    private function ensureTokenIsValid(): void
+    {
+        if ($this->user->microsoft_token_expires_at && $this->user->microsoft_token_expires_at->isPast()) {
+            try {
+                $this->refreshToken();
+            } catch (\Exception $e) {
+                Log::error('Failed to refresh Microsoft token: ' . $e->getMessage());
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * Refresh the access token
+     */
+    private function refreshToken(): void
+    {
+        if (!$this->user->microsoft_refresh_token) {
+            throw new \Exception('No refresh token available.');
+        }
+
+        $client = new Client();
+        try {
+            $response = $client->post(
+                'https://login.microsoftonline.com/' . config('microsoft.microsoft.tenant_id') . '/oauth2/v2.0/token',
+                [
+                    'form_params' => [
+                        'client_id' => config('microsoft.microsoft.client_id'),
+                        'client_secret' => config('microsoft.microsoft.client_secret'),
+                        'refresh_token' => $this->user->microsoft_refresh_token,
+                        'grant_type' => 'refresh_token',
+                        'scope' => 'Calendars.ReadWrite User.Read offline_access',
+                    ],
+                ]
+            );
+
+            $tokenData = json_decode($response->getBody(), true);
+
+            if (isset($tokenData['access_token'])) {
+                $this->user->microsoft_token = $tokenData['access_token'];
+                $this->token = $tokenData['access_token'];
+                if (isset($tokenData['refresh_token'])) {
+                    $this->user->microsoft_refresh_token = $tokenData['refresh_token'];
+                }
+                $this->user->microsoft_token_expires_at = now()->addSeconds($tokenData['expires_in']);
+                $this->user->save();
+
+                Log::info('Microsoft token refreshed successfully for user: ' . $this->user->id);
+            } else {
+                throw new \Exception('Invalid token response from Microsoft.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Token refresh failed: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     private function getHeaders(): array

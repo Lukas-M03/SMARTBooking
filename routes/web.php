@@ -69,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/microsoft/connect', [MicrosoftAuthController::class, 'redirectToMicrosoft'])->name('microsoft.redirect');
     Route::get('/microsoft/disconnect', [MicrosoftAuthController::class, 'disconnect'])->name('microsoft.disconnect');
+    Route::post('/microsoft/refresh-token', [MicrosoftAuthController::class, 'refreshToken'])->name('microsoft.refresh-token');
 });
 
 Route::get('/auth/callback', [MicrosoftAuthController::class, 'handleCallback'])->name('microsoft.callback');

@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use GuzzleHttp\Client;
+use App\Traits\HandlesMicrosoftTokens;
 
 // Copilot generated controller to handle Microsoft OAuth authentication and token management for calendar integration
 class MicrosoftAuthController extends Controller
 {
+    use HandlesMicrosoftTokens;
+
     private Client $httpClient;
 
     public function __construct()
@@ -93,21 +96,59 @@ class MicrosoftAuthController extends Controller
      */
     private function exchangeCodeForToken(string $code): array
     {
-        $response = $this->httpClient->post(
-            'https://login.microsoftonline.com/' . config('microsoft.microsoft.tenant_id') . '/oauth2/v2.0/token',
-            [
-                'form_params' => [
-                    'client_id' => config('microsoft.microsoft.client_id'),
-                    'client_secret' => config('microsoft.microsoft.client_secret'),
-                    'code' => $code,
-                    'redirect_uri' => route('microsoft.callback'),
-                    'grant_type' => 'authorization_code',
-                    'scope' => 'Calendars.ReadWrite User.Read offline_access',
-                ],
-            ]
-        );
+        try {
+            $response = $this->httpClient->post(
+                'https://login.microsoftonline.com/' . config('microsoft.microsoft.tenant_id') . '/oauth2/v2.0/token',
+                [
+                    'form_params' => [
+                        'client_id' => config('microsoft.microsoft.client_id'),
+                        'client_secret' => config('microsoft.microsoft.client_secret'),
+                        'code' => $code,
+                        'redirect_uri' => route('microsoft.callback'),
+                        'grant_type' => 'authorization_code',
+                        'scope' => 'Calendars.ReadWrite User.Read offline_access',
+                    ],
+                ]
+            );
 
-        return json_decode($response->getBody(), true);
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            Log::error('Failed to exchange code for token: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Refresh an expired access token using refresh token
+     */
+    public function refreshToken(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        if (!$user->microsoft_token) {
+            return response()->json(['error' => 'Not connected to Outlook'], 400);
+        }
+
+        try {
+            $refreshed = $this->refreshMicrosoftToken($user);
+
+            if ($refreshed) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Token refreshed successfully',
+                    'expires_at' => $user->microsoft_token_expires_at,
+                ]);
+            }
+
+            return response()->json(['error' => 'Failed to refresh token'], 500);
+        } catch (\Exception $e) {
+            Log::error('Token refresh request failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to refresh token'], 500);
+        }
     }
 
     /**
