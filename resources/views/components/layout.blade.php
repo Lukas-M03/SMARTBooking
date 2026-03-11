@@ -15,7 +15,16 @@
     @guest
     <nav class="navbar">
         <div class="logo">{{ config('app.name', 'SMART Booking') }}</div>
-        <div class="nav-buttons">
+        <button
+            type="button"
+            class="nav-toggle js-nav-toggle"
+            aria-expanded="false"
+            aria-controls="guest-nav-menu"
+            data-target="guest-nav-menu"
+        >
+            Menu
+        </button>
+        <div class="nav-buttons" id="guest-nav-menu">
             <a href="{{ route('login') }}" class="btn-login">Login</a>
             <a href="{{ route('register') }}" class="btn-register">Register</a>
         </div>
@@ -26,7 +35,16 @@
     @auth
     <nav class="navbar">
         <div class="logo">SMART Booking</div>
-        <nav class="nav-buttons">
+        <button
+            type="button"
+            class="nav-toggle js-nav-toggle"
+            aria-expanded="false"
+            aria-controls="auth-nav-menu"
+            data-target="auth-nav-menu"
+        >
+            Menu
+        </button>
+        <div class="nav-buttons" id="auth-nav-menu">
             @if(Auth::user()->isStudent())
                 <a href="{{ route('student.dashboard') }} " class="btn-nav-page">Dashboard</a>
                 <a href="{{ route('bookings.create') }}" class="btn-nav-page">New Booking</a>
@@ -42,7 +60,7 @@
                 @csrf
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
-        </nav>
+        </div>
     </nav>
     @endauth
 
@@ -63,6 +81,38 @@
     <footer class="footer">
         <p>&copy; 2025 SMART Booking System. Developed by Lukas Mickevicius. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggles = document.querySelectorAll('.js-nav-toggle');
+
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    const targetId = toggle.getAttribute('data-target');
+                    const menu = document.getElementById(targetId);
+
+                    if (!menu) {
+                        return;
+                    }
+
+                    const isOpen = menu.classList.toggle('is-open');
+                    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    document.querySelectorAll('.nav-buttons').forEach(function (menu) {
+                        menu.classList.remove('is-open');
+                    });
+
+                    toggles.forEach(function (toggle) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            });
+        });
+    </script>
     @livewireScripts
 </body>
 </html>
