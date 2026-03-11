@@ -127,13 +127,15 @@ td {
 }
 
 .booking-calendar .fc-toolbar-title {
-    font-size: 1.1rem;
+    font-size: 17px;
     color: #111827;
 }
 
 .booking-calendar .fc-button {
     background: #1f2937;
     border-color: #1f2937;
+    font-size: 14px;
+    margin-right: 4px;
 }
 
 .booking-calendar .fc-button:hover {
