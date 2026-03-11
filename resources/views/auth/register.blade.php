@@ -54,7 +54,8 @@
 
             {{-- ── STUDENT: Module picker ─────────────────────────────────────── --}}
             <div class="form-group" id="modulesField" style="display: none;">
-                <x-form.label>Modules / Areas You Need Help With</x-form.label>
+                <x-form.label for="modules_group">Modules / Areas You Need Help With</x-form.label>
+                <input type="hidden" id="modules_group" aria-hidden="true">
                 <p class="text-sm text-gray-500" style="margin-bottom: 0.75rem;">
                     Select one or more areas — the adviser list below will automatically filter to show advisers who specialise in those areas.
                 </p>
@@ -95,7 +96,8 @@
 
             {{-- ── ADVISER: Expertise checkboxes ─────────────────────────────── --}}
             <div class="form-group" id="expertiseField" style="display: none;">
-                <x-form.label>Areas of Expertise</x-form.label>
+                <x-form.label for="expertise_group">Areas of Expertise</x-form.label>
+                <input type="hidden" id="expertise_group" aria-hidden="true">
                 @foreach ($expertiseList as $expertise)
                     <label style="display: flex; align-items: center; margin: 0.5rem 0; cursor: pointer;">
                         <input
