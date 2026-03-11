@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Log;
 
 class CalendarController extends Controller
 {
+    /**
+     * Return calendar events for the authenticated user and requested date range.
+     *
+     * FullCalendar sends `start` and `end` query params; we normalize both to
+     * full-day boundaries and return role-specific event payloads.
+     */
     public function events(Request $request)
     {
         $user = Auth::user();
@@ -29,8 +35,14 @@ class CalendarController extends Controller
         return response()->json([]);
     }
 
+    /**
+     * Build student-facing events:
+     * - Student's own bookings (normal events)
+     * - Adviser bookings/outlook availability (background blocked times)
+     */
     private function buildStudentEvents(User $student, Carbon $start, Carbon $end): array
     {
+        // 1) Student's own bookings in the selected range.
         $studentBookings = Booking::with('adviser')
             ->where('student_id', $student->id)
             ->whereBetween('preferred_datetime', [$start, $end])
@@ -41,6 +53,7 @@ class CalendarController extends Controller
             return $this->formatBookingEvent($booking, true);
         })->all();
 
+        // 2) Determine the most relevant adviser from recent bookings.
         $adviserId = Booking::where('student_id', $student->id)
             ->whereIn('status', ['pending', 'confirmed'])
             ->orderByDesc('preferred_datetime')
@@ -62,6 +75,7 @@ class CalendarController extends Controller
             return $events;
         }
 
+        // 3) Add adviser's pending/confirmed bookings as background blocks.
         $adviserBookings = Booking::with('student')
             ->where('adviser_id', $adviser->id)
             ->whereIn('status', ['pending', 'confirmed'])
@@ -73,11 +87,15 @@ class CalendarController extends Controller
             return $this->formatBookingEvent($booking, false, true);
         })->all();
 
+        // 4) Add unavailable periods from adviser Outlook calendar (if connected).
         $outlookEvents = $this->getOutlookAvailabilityEvents($adviser, $start, $end);
 
         return array_merge($events, $backgroundEvents, $outlookEvents);
     }
 
+    /**
+     * Build adviser-facing events (their own bookings only).
+     */
     private function buildAdviserEvents(User $adviser, Carbon $start, Carbon $end): array
     {
         $adviserBookings = Booking::with('student')
@@ -91,6 +109,12 @@ class CalendarController extends Controller
         })->all();
     }
 
+    /**
+     * Convert a booking record into FullCalendar event format.
+     *
+     * When `$isBackground` is true, the event is rendered as an availability
+     * block (non-primary visual layer) instead of a normal foreground event.
+     */
     private function formatBookingEvent(Booking $booking, bool $forStudent, bool $isBackground = false): array
     {
         $start = $booking->preferred_datetime->copy();
@@ -124,8 +148,13 @@ class CalendarController extends Controller
         ];
     }
 
+    /**
+     * Fetch adviser Outlook events and map them into FullCalendar background
+     * availability blocks to indicate already-occupied times.
+     */
     private function getOutlookAvailabilityEvents(User $adviser, Carbon $start, Carbon $end): array
     {
+        // Only attempt Graph API calls when the adviser has a valid token.
         if (!$adviser->hasMicrosoftToken()) {
             return [];
         }
@@ -138,6 +167,7 @@ class CalendarController extends Controller
                 $eventStart = Carbon::parse($event['start']['dateTime'] ?? null);
                 $eventEnd = Carbon::parse($event['end']['dateTime'] ?? null);
 
+                // Skip malformed events returned by external API.
                 if (!$eventStart || !$eventEnd) {
                     return null;
                 }
@@ -154,6 +184,7 @@ class CalendarController extends Controller
                 ];
             })->filter()->values()->all();
         } catch (\Exception $e) {
+            // Graceful fallback: keep calendar functional even if Outlook fails.
             Log::warning('Outlook availability fetch failed: ' . $e->getMessage(), [
                 'adviser_id' => $adviser->id,
             ]);

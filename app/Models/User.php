@@ -23,6 +23,7 @@ class User extends Authenticatable
         'role',
         'student_id',
         'phone',
+        'preferred_adviser_id',
         'microsoft_token',
         'microsoft_refresh_token',
         'microsoft_token_expires_at',
@@ -53,9 +54,23 @@ class User extends Authenticatable
     }
 
     // Relationships
+
+    /** Adviser's areas of expertise (adviser_expertise pivot). */
     public function expertise()
     {
         return $this->belongsToMany(Expertise::class, 'adviser_expertise', 'user_id', 'expertise_id');
+    }
+
+    /** Modules/areas a student needs help with (student_modules pivot). */
+    public function modules()
+    {
+        return $this->belongsToMany(Expertise::class, 'student_modules', 'student_id', 'expertise_id');
+    }
+
+    /** The adviser a student selected at registration time. */
+    public function preferredAdviser()
+    {
+        return $this->belongsTo(User::class, 'preferred_adviser_id');
     }
 
     public function studentBookings()

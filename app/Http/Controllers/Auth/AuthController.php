@@ -45,34 +45,57 @@ class AuthController extends Controller
     public function showRegister()
     {
         $expertiseList = Expertise::all();
-        return view('auth.register', compact('expertiseList'));
+
+        // Load advisers with their expertise so the registration form can
+        // dynamically filter the adviser list based on module selection.
+        $advisers = User::where('role', 'adviser')
+            ->with('expertise')
+            ->get()
+            ->map(fn ($a) => [
+                'id'         => $a->id,
+                'name'       => $a->name,
+                'expertise'  => $a->expertise->pluck('id')->all(),
+            ]);
+
+        return view('auth.register', compact('expertiseList', 'advisers'));
     }
 
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'in:student,adviser'],
-            'student_id' => ['nullable', 'string', 'max:50'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'expertise' => ['nullable', 'array'],
-            'expertise.*' => ['exists:expertise,id'],
+            'name'                 => ['required', 'string', 'max:255'],
+            'email'                => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password'             => ['required', 'string', 'min:8', 'confirmed'],
+            'role'                 => ['required', 'in:student,adviser'],
+            'student_id'           => ['nullable', 'string', 'max:50'],
+            'phone'                => ['nullable', 'string', 'max:20'],
+            // Adviser fields
+            'expertise'            => ['nullable', 'array'],
+            'expertise.*'          => ['exists:expertise,id'],
+            // Student fields
+            'modules'              => ['nullable', 'array'],
+            'modules.*'            => ['exists:expertise,id'],
+            'preferred_adviser_id' => ['nullable', 'exists:users,id'],
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
-            'student_id' => $validated['student_id'] ?? null,
-            'phone' => $validated['phone'] ?? null,
+            'name'                 => $validated['name'],
+            'email'                => $validated['email'],
+            'password'             => Hash::make($validated['password']),
+            'role'                 => $validated['role'],
+            'student_id'           => $validated['student_id'] ?? null,
+            'phone'                => $validated['phone'] ?? null,
+            'preferred_adviser_id' => $validated['preferred_adviser_id'] ?? null,
         ]);
 
-        // Attach expertise if the user is an adviser
+        // Attach expertise areas if the user is an adviser.
         if ($validated['role'] === 'adviser' && !empty($validated['expertise'])) {
             $user->expertise()->attach($validated['expertise']);
+        }
+
+        // Attach module interests if the user is a student.
+        if ($validated['role'] === 'student' && !empty($validated['modules'])) {
+            $user->modules()->attach($validated['modules']);
         }
 
         Auth::login($user);

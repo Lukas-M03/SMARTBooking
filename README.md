@@ -99,3 +99,22 @@ c:> .\com621.ps1
 The script will open vscode then wait for you to press 'y' in the terminal to confirm
 installation. Once completed you can open your project in vs-code, then select the PHP
 profile to have full PHP/Laravel support.
+
+**First run on a new device (project bootstrap)**
+
+Your local environment file (`.env`) is machine-specific and is not committed to Git.
+The repository only tracks `.env.example` as a template.
+
+From the project root, run:
+
+```powershell
+copy .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate
+npm install
+npm run dev
+```
+
+Then update values in `.env` for your local setup (database credentials, Microsoft app
+settings, mail settings, etc.).
