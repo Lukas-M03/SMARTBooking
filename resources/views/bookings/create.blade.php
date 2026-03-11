@@ -6,36 +6,6 @@
             @csrf
 
             <div class="form-group">
-                <x-form.label for="expertise_id">Area of Expertise / Subject</x-form.label>
-                <x-form.select id="expertise_id" name="expertise_id" required>
-                    @foreach ($expertiseList as $expertise)
-                        <option value="{{ $expertise->id }}"
-                            {{ old('expertise_id') == $expertise->id ? 'selected' : '' }}>
-                            {{ $expertise->name }}
-                        </option>
-                    @endforeach
-                </x-form.select>
-                <x-form.error name="expertise_id" />
-            </div>
-
-            <div class="form-group">
-                <x-form.label for="adviser_id">Choose Adviser</x-form.label>
-                <x-form.select id="adviser_id" name="adviser_id" required>
-                    <option value="">Select an adviser</option>
-                    @foreach ($advisers as $adviser)
-                        <option value="{{ $adviser->id }}"
-                            {{ old('adviser_id') == $adviser->id ? 'selected' : '' }}>
-                            {{ $adviser->name }}
-                        </option>
-                    @endforeach
-                </x-form.select>
-                <x-form.error name="adviser_id" />
-                <small class="text-gray-500 display-block mt-10px">
-                    Only advisers who match your selected expertise can be booked.
-                </small>
-            </div>
-
-            <div class="form-group">
                 <x-form.label for="topic">Meeting Topic</x-form.label>
                 <x-form.input type="text" id="topic" name="topic" value="{{ old('topic') }}" required
                     placeholder="e.g., Dissertation guidance, Assignment help" />

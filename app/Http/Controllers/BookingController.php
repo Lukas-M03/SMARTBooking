@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Expertise;
 use App\Models\User;
 use App\Models\Notification;
 use Illuminate\Http\Request;
@@ -38,52 +37,41 @@ class BookingController extends Controller
 
     /**
      * Display the form to create a new booking.
-     * Retrieves all available expertise areas for selection.
      */
     public function create()
     {
-        $expertiseList = Expertise::all();
-        $advisers = User::with('expertise')
-            ->where('role', 'adviser')
-            ->orderBy('name')
-            ->get();
-
-        return view('bookings.create', compact('expertiseList', 'advisers'));
+        return view('bookings.create');
     }
 
     /**
      * Store a newly created booking in the database.
-     * Validates input, finds an available adviser with the selected expertise,
+     * Validates input, resolves adviser/expertise from registration profile,
      * creates the booking with pending status, and notifies both student and adviser.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'expertise_id' => ['required', 'exists:expertise,id'],
-            'adviser_id' => ['required', 'exists:users,id'],
             'topic' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'preferred_datetime' => ['required', 'date', 'after:now'],
             'meeting_type' => ['required', 'in:in-person,online,phone'],
         ]);
 
-        $adviser = User::where('id', $validated['adviser_id'])
-            ->where('role', 'adviser')
-            ->whereHas('expertise', function ($query) use ($validated) {
-                $query->where('expertise.id', $validated['expertise_id']);
-            })
-            ->first();
+        $assignment = $this->resolveBookingAssignment(Auth::user());
 
-        if (!$adviser) {
+        if (!$assignment) {
             return back()
                 ->withInput()
-                ->withErrors(['adviser_id' => 'Selected adviser does not offer the chosen expertise.']);
+                ->withErrors(['topic' => 'No adviser could be assigned from your registered modules. Please update your registration profile.']);
         }
+
+        $adviser = $assignment['adviser'];
+        $expertiseId = $assignment['expertise_id'];
 
         $booking = Booking::create([
             'student_id' => Auth::id(),
             'adviser_id' => $adviser->id,
-            'expertise_id' => $validated['expertise_id'],
+            'expertise_id' => $expertiseId,
             'topic' => $validated['topic'],
             'description' => $validated['description'],
             'preferred_datetime' => $validated['preferred_datetime'],
@@ -108,6 +96,74 @@ class BookingController extends Controller
         ]);
 
         return redirect()->route('bookings.show', $booking)->with('success', 'Booking request submitted successfully!');
+    }
+
+    /**
+     * Resolve adviser and expertise for a student booking from registration data.
+     * Priority:
+     * 1) Student's preferred adviser (if set and matches any student module)
+     * 2) Any matching adviser with the lowest active workload
+     */
+    private function resolveBookingAssignment(User $student): ?array
+    {
+        $moduleIds = $student->modules()
+            ->pluck('expertise.id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if (empty($moduleIds)) {
+            return null;
+        }
+
+        $preferredAdviser = $student->preferredAdviser()
+            ->where('role', 'adviser')
+            ->whereHas('expertise', function ($query) use ($moduleIds) {
+                $query->whereIn('expertise.id', $moduleIds);
+            })
+            ->first();
+
+        if ($preferredAdviser) {
+            $preferredExpertiseId = $preferredAdviser->expertise()
+                ->whereIn('expertise.id', $moduleIds)
+                ->value('expertise.id');
+
+            if ($preferredExpertiseId) {
+                return [
+                    'adviser' => $preferredAdviser,
+                    'expertise_id' => (int) $preferredExpertiseId,
+                ];
+            }
+        }
+
+        $fallbackAdviser = User::where('role', 'adviser')
+            ->whereHas('expertise', function ($query) use ($moduleIds) {
+                $query->whereIn('expertise.id', $moduleIds);
+            })
+            ->withCount([
+                'adviserBookings as active_bookings_count' => function ($query) {
+                    $query->whereIn('status', ['pending', 'confirmed']);
+                },
+            ])
+            ->orderBy('active_bookings_count')
+            ->orderBy('name')
+            ->first();
+
+        if (!$fallbackAdviser) {
+            return null;
+        }
+
+        $fallbackExpertiseId = $fallbackAdviser->expertise()
+            ->whereIn('expertise.id', $moduleIds)
+            ->value('expertise.id');
+
+        if (!$fallbackExpertiseId) {
+            return null;
+        }
+
+        return [
+            'adviser' => $fallbackAdviser,
+            'expertise_id' => (int) $fallbackExpertiseId,
+        ];
     }
 
     /**
