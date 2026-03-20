@@ -12,19 +12,18 @@
 
         @if ($notifications->count() > 0)
             @foreach ($notifications as $notification)
-                <div class="div-notifications-list"
-                    style="border-left-color: {{ $notification->type === 'success' ? '#28a745' : ($notification->type === 'warning' ? '#ffc107' : ($notification->type === 'error' ? '#dc3545' : '#667eea')) }}; background: {{ $notification->is_read ? '#f8f9fa' : '#e7f3ff' }};">
+                <div
+                    class="div-notifications-list {{ $notification->is_read ? 'bg-gray-50' : 'bg-blue-50' }} {{ $notification->type === 'success' ? 'border-l-green-600' : ($notification->type === 'warning' ? 'border-l-amber-400' : ($notification->type === 'error' ? 'border-l-red-600' : 'border-l-indigo-500')) }}">
 
-                    <div style="flex: 1;">
-                        <strong style="font-size: 17px;">{{ $notification->title }}</strong>
-                        <p style="margin-top: 7px; color: #666;">{{ $notification->message }}</p>
-                        <small style="color: #999;">{{ $notification->created_at->diffForHumans() }}</small>
+                    <div class="flex-1">
+                        <strong class="text-[17px]">{{ $notification->title }}</strong>
+                        <p class="mt-2 text-gray-600">{{ $notification->message }}</p>
+                        <small class="text-gray-400">{{ $notification->created_at->diffForHumans() }}</small>
                     </div>
                     @if (!$notification->is_read)
                         <form method="POST" action="{{ route('notifications.mark-read', $notification->id) }}">
                             @csrf
-                            <button type="submit"
-                                style="background: none; border: none; color: #667eea; cursor: pointer; font-size: 14px; text-decoration: underline;">
+                            <button type="submit" class="bg-transparent border-none text-indigo-500 cursor-pointer text-sm underline">
                                 Mark as read
                             </button>
                         </form>
@@ -32,11 +31,11 @@
                 </div>
             @endforeach
 
-            <div style="margin-top: 28px;">
+            <div class="mt-7">
                 {{ $notifications->links() }}
             </div>
         @else
-            <p style="text-align: center; color: #999; padding: 28px;">No notifications yet.</p>
+            <p class="text-center text-gray-400 p-7">No notifications yet.</p>
         @endif
     </div>
 </x-layout>

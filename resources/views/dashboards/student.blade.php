@@ -5,19 +5,19 @@
 </div>
 
 <!-- Microsoft Calendar Connection -->
-<div class="card" style="border-left: 4px solid #0078d4;">
+<div class="card border-l-4 border-[#0078d4]">
     <div class="flex items-center justify-between">
         <div>
-            <h3 style="margin: 0;">Microsoft Outlook Calendar</h3>
-            <p class="text-gray-600 mt-2">
+            <h3 class="m-0">Microsoft Outlook Calendar</h3>
+            <div class="text-gray-600 mt-2">
                 @if(Auth::user()->hasMicrosoftToken())
-                    <span style="color: #107c10; font-weight: 600;">✓ Connected</span>
+                    <span class="text-green-700 font-semibold">✓ Connected</span>
                     <p class="text-sm text-gray-500 mt-1">Your bookings will automatically sync to Outlook</p>
                 @else
-                    <span style="color: #d83b01;">Not Connected</span>
+                    <span class="text-orange-700">Not Connected</span>
                     <p class="text-sm text-gray-500 mt-1">Connect your Outlook calendar to receive booking notifications</p>
                 @endif
-            </p>
+            </div>
         </div>
         <div>
             @if(Auth::user()->hasMicrosoftToken())

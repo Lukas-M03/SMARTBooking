@@ -70,8 +70,7 @@ class AuthController extends Controller
             'student_id'           => ['nullable', 'string', 'max:50'],
             'phone'                => ['nullable', 'string', 'max:20'],
             // Adviser fields
-            'expertise'            => ['nullable', 'array'],
-            'expertise.*'          => ['exists:expertise,id'],
+            'expertise_id'         => ['nullable', 'required_if:role,adviser', 'exists:expertise,id'],
             // Student fields
             'modules'              => ['nullable', 'array'],
             'modules.*'            => ['exists:expertise,id'],
@@ -89,8 +88,8 @@ class AuthController extends Controller
         ]);
 
         // Attach expertise areas if the user is an adviser.
-        if ($validated['role'] === 'adviser' && !empty($validated['expertise'])) {
-            $user->expertise()->attach($validated['expertise']);
+        if ($validated['role'] === 'adviser' && !empty($validated['expertise_id'])) {
+            $user->expertise()->attach($validated['expertise_id']);
         }
 
         // Attach module interests if the user is a student.

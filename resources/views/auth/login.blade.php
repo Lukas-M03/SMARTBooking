@@ -1,6 +1,6 @@
 <x-layout>
 
-    <div class="card" style="max-width: 500px; margin: 80px auto;">
+    <div class="card max-w-md mx-auto my-20">
         <h1 class="h1">Login</h1>
 
         <form method="POST" action="{{ route('login') }}">
@@ -23,12 +23,12 @@
                 <x-form.toggle name="remember" />
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+            <button type="submit" class="btn btn-primary w-full">Login</button>
 
             
         </form>
-        <p style="text-align: center; margin-top: 24px;">
-                Don't have an account? <a href="{{ route('register') }}" style="color: #667eea;">Register here</a>
+        <p class="text-center mt-6">
+            Don't have an account? <a href="{{ route('register') }}" class="text-indigo-500">Register here</a>
             </p>
     </div>
 

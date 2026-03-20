@@ -27,7 +27,9 @@ class UserSeeder extends Seeder
             'role' => 'adviser',
             'phone' => '+44 20 1234 5678',
         ]);
-        $adviser1->expertise()->attach([1, 2, 3]);
+        $adviser1->expertise()->attach(
+            Expertise::where('name', 'Computer Science')->firstOrFail()->id
+        );
 
         $adviser2 = User::create([
             'name' => 'Prof. Michael Chen',
@@ -36,7 +38,9 @@ class UserSeeder extends Seeder
             'role' => 'adviser',
             'phone' => '+44 20 1234 5679',
         ]);
-        $adviser2->expertise()->attach([7, 8]);
+        $adviser2->expertise()->attach(
+            Expertise::where('name', 'Mathematics')->firstOrFail()->id
+        );
 
         $adviser3 = User::create([
             'name' => 'Dr. Emily Roberts',
@@ -45,7 +49,9 @@ class UserSeeder extends Seeder
             'role' => 'adviser',
             'phone' => '+44 20 1234 5680',
         ]);
-        $adviser3->expertise()->attach([4, 5, 6]);
+        $adviser3->expertise()->attach(
+            Expertise::where('name', 'Biology')->firstOrFail()->id
+        );
 
         // Create Sample Students
         User::create([

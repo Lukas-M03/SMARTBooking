@@ -32,9 +32,127 @@ calendarElements.forEach((element) => {
 	calendar.render();
 });
 
+function initRegisterForm() {
+	const registerForm = document.getElementById('registerForm');
+
+	if (!registerForm) {
+		return;
+	}
+
+	const parseJsonDataset = (value, fallback) => {
+		try {
+			return JSON.parse(value ?? '');
+		} catch (error) {
+			return fallback;
+		}
+	};
+
+	const allAdvisers = parseJsonDataset(registerForm.dataset.advisers, []);
+	const oldModules = parseJsonDataset(registerForm.dataset.oldModules, []);
+	const oldAdviser = registerForm.dataset.oldAdviser || '';
+
+	const roleSelect = document.getElementById('role');
+	const studentIdField = document.getElementById('studentIdField');
+	const modulesField = document.getElementById('modulesField');
+	const adviserField = document.getElementById('adviserField');
+	const expertiseField = document.getElementById('expertiseField');
+	const adviserHint = document.getElementById('adviserHint');
+	const adviserSelect = document.getElementById('preferred_adviser_id');
+
+	const setHidden = (element, hidden) => {
+		if (element) {
+			element.classList.toggle('hidden', hidden);
+		}
+	};
+
+	const toggleRoleFields = () => {
+		const role = roleSelect?.value;
+
+		if (role === 'student') {
+			setHidden(studentIdField, false);
+			setHidden(modulesField, false);
+			setHidden(adviserField, false);
+			setHidden(expertiseField, true);
+			return;
+		}
+
+		if (role === 'adviser') {
+			setHidden(studentIdField, true);
+			setHidden(modulesField, true);
+			setHidden(adviserField, true);
+			setHidden(expertiseField, false);
+			return;
+		}
+
+		setHidden(studentIdField, true);
+		setHidden(modulesField, true);
+		setHidden(adviserField, true);
+		setHidden(expertiseField, true);
+	};
+
+	const filterAdvisers = () => {
+		if (!adviserHint || !adviserSelect) {
+			return;
+		}
+
+		const checkedModules = Array.from(
+			document.querySelectorAll('.module-checkbox:checked')
+		).map((checkbox) => parseInt(checkbox.value, 10));
+
+		const filteredAdvisers = checkedModules.length === 0
+			? allAdvisers
+			: allAdvisers.filter((adviser) =>
+				checkedModules.some((moduleId) => adviser.expertise.includes(moduleId))
+			);
+
+		if (checkedModules.length === 0) {
+			adviserHint.textContent = 'Showing all advisers. Select a module above to filter by expertise.';
+		} else {
+			adviserHint.textContent = filteredAdvisers.length === 0
+				? 'No advisers found for the selected modules.'
+				: `Showing ${filteredAdvisers.length} adviser(s) who cover your selected module(s).`;
+		}
+
+		const currentValue = adviserSelect.value || oldAdviser;
+		adviserSelect.innerHTML = '<option value="">— No preference —</option>';
+
+		filteredAdvisers.forEach((adviser) => {
+			const option = document.createElement('option');
+			option.value = adviser.id;
+			option.textContent = adviser.name;
+
+			if (String(adviser.id) === String(currentValue)) {
+				option.selected = true;
+			}
+
+			adviserSelect.appendChild(option);
+		});
+	};
+
+	if (Array.isArray(oldModules) && oldModules.length > 0) {
+		oldModules.forEach((id) => {
+			const checkbox = document.querySelector(`.module-checkbox[value="${id}"]`);
+
+			if (checkbox) {
+				checkbox.checked = true;
+			}
+		});
+	}
+
+	roleSelect?.addEventListener('change', toggleRoleFields);
+	document.querySelectorAll('.module-checkbox').forEach((checkbox) => {
+		checkbox.addEventListener('change', filterAdvisers);
+	});
+
+	toggleRoleFields();
+	filterAdvisers();
+}
+
 // ── Mobile navigation toggle ─────────────────────────────────────────────────
 // Wait until the DOM is ready before attaching event listeners.
 document.addEventListener('DOMContentLoaded', function () {
+	initRegisterForm();
+
 	// All mobile menu toggle buttons (guest + authenticated nav).
 	const toggles = document.querySelectorAll('.js-nav-toggle');
 
