@@ -81,7 +81,19 @@ class MicrosoftAuthController extends Controller
                 $user->microsoft_token_expires_at = now()->addSeconds($token['expires_in']);
                 $user->save();
 
-                return redirect('/dashboard')->with('success', 'Microsoft calendar connected successfully!');
+                if ($user->isStudent()) {
+                    return redirect('/student/dashboard')->with('success', 'Microsoft calendar connected successfully!');
+                }
+
+                if ($user->isAdviser()) {
+                    return redirect('/adviser/dashboard')->with('success', 'Microsoft calendar connected successfully!');
+                }
+
+                if ($user->isAdmin()) {
+                    return redirect('/admin/dashboard')->with('success', 'Microsoft calendar connected successfully!');
+                }
+
+                return redirect('/')->with('success', 'Microsoft calendar connected successfully!');
             }
 
             return redirect('/login')->with('error', 'User not found.');
