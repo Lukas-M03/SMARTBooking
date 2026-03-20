@@ -11,6 +11,9 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Use updateOrCreate so seeding can be safely re-run without duplicates.
+        // This is important because expertise is reseeded and adviser mappings must be restored.
+
         // Create Admin
         User::updateOrCreate(['email' => 'admin@smartbooking.com'], [
             'name' => 'System Administrator',
@@ -20,6 +23,8 @@ class UserSeeder extends Seeder
         ]);
 
         // Create Studies Advisers
+        // Each adviser is mapped to exactly one module using sync([...]).
+        // sync() ensures stale pivot rows are replaced on reseed.
         $adviser1 = User::updateOrCreate(['email' => 'sarah.thompson@smartbooking.com'], [
             'name' => 'Dr. Sarah Thompson',
             'email' => 'sarah.thompson@smartbooking.com',
@@ -54,6 +59,7 @@ class UserSeeder extends Seeder
         ]);
 
         // Create Sample Students
+        // Students are also idempotent to avoid duplicate records across runs.
         User::updateOrCreate(['email' => 'john.smith@student.ac.uk'], [
             'name' => 'John Smith',
             'email' => 'john.smith@student.ac.uk',

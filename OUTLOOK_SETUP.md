@@ -15,10 +15,21 @@ This guide explains how to set up the Azure OAuth integration for Microsoft Outl
 3. Click **New registration**
 4. Fill in the following:
    - **Name**: SMARTBooking
-   - **Supported account types**: Accounts in this organizational directory only
+    - **Supported account types**: Any Entra ID tenant + Personal Microsoft accounts
    - **Redirect URI**: Web - `http://localhost:8000/auth/callback` (for development)
      - For production: Use your actual domain (e.g., `https://yourdomain.com/auth/callback`)
 5. Click **Register**
+
+### Required Authentication/Manifest Settings
+
+After creating the app registration, verify:
+
+- **Authentication** tab:
+   - Supported account types: **Any Entra ID tenant + Personal Microsoft accounts**
+   - Web redirect URI includes only your callback URL (e.g., `https://yourdomain.com/auth/callback`)
+- **Manifest**:
+   - `"signInAudience": "AzureADandPersonalMicrosoftAccount"`
+   - `"requestedAccessTokenVersion": 2`
 
 ## Step 2: Configure Application Credentials
 
@@ -51,9 +62,11 @@ Update your `.env` file with the values from Azure:
 ```env
 MICROSOFT_CLIENT_ID=your_application_client_id
 MICROSOFT_CLIENT_SECRET=your_client_secret
-MICROSOFT_TENANT_ID=your_directory_tenant_id
-MICROSOFT_REDIRECT_URI=http://localhost:8000/auth/callback (or your production URL)
+MICROSOFT_TENANT_ID=common
+APP_URL=http://localhost:8000
 ```
+
+For production, set `APP_URL` to your live domain (for example `https://yourdomain.com`).
 
 ## Step 5: Database Migration
 
@@ -107,6 +120,21 @@ This creates the following columns in the `users` table:
 - Ensure API permissions are granted with admin consent
 - Check that the application is not expired in Azure
 
+### AADSTS50020 (personal Outlook account cannot access tenant)
+- Ensure **Supported account types** is set to Any Entra ID tenant + Personal Microsoft accounts
+- Ensure `MICROSOFT_TENANT_ID=common`
+- Ensure manifest has:
+   - `signInAudience = AzureADandPersonalMicrosoftAccount`
+   - `requestedAccessTokenVersion = 2`
+
+### 404 after reconnect/callback
+- Confirm redirect URI in Azure is exactly your callback route (`/auth/callback`)
+- Confirm app route exists: `/auth/callback`
+- Ensure app is running latest code where callback redirects to role-specific dashboard
+- Clear config/route cache after env updates:
+   - `php artisan config:clear`
+   - `php artisan route:clear`
+
 ### Token refresh issues
 - Check Laravel logs: `storage/logs/laravel.log`
 - Verify `microsoft.php` config file is correctly set up
@@ -122,7 +150,9 @@ This creates the following columns in the `users` table:
 Before deploying to production:
 
 1. Change `MICROSOFT_REDIRECT_URI` to your production domain
-2. Update the redirect URI in Azure app registration
+2. Set `APP_URL` to your production domain
+3. Keep `MICROSOFT_TENANT_ID=common` for personal Microsoft account sign-in
+4. Update the redirect URI in Azure app registration
 3. Ensure HTTPS is used for all URLs
 4. Verify environment variables are set on your cloud provider
 5. Set longer-lived refresh tokens in Azure if needed
@@ -148,7 +178,7 @@ ALTER TABLE users ADD COLUMN microsoft_token_expires_at TIMESTAMP;
 - **Route**: `/auth/callback`
 - **Method**: GET
 - **Auth**: Not required
-- **Redirects**: Dashboard with success/error message
+- **Redirects**: Role-specific dashboard with success/error message
 
 ### Disconnect Outlook
 - **Route**: `/microsoft/disconnect`
@@ -157,7 +187,7 @@ ALTER TABLE users ADD COLUMN microsoft_token_expires_at TIMESTAMP;
 - **Redirects**: Back to referrer with confirmation
 
 ### Refresh Token (Manual)
-- **Route**: `/microsoft/refresh`
+- **Route**: `/microsoft/refresh-token`
 - **Method**: POST
 - **Auth**: Required
 - **Returns**: JSON response with status

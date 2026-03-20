@@ -97,6 +97,7 @@ class BookingController extends Controller
             'type' => 'info',
         ]);
 
+        // Best-effort Outlook sync: booking succeeds even if external API fails.
         $this->syncBookingToConnectedCalendars($booking);
 
         return redirect()->route('bookings.show', $booking)->with('success', 'Booking request submitted successfully!');
@@ -109,6 +110,7 @@ class BookingController extends Controller
     {
         $booking->loadMissing(['student', 'adviser', 'expertise']);
 
+        // Sync to any connected participant calendars (student and/or adviser).
         $participants = collect([$booking->student, $booking->adviser])
             ->filter(fn ($user) => $user && $user->hasMicrosoftToken())
             ->unique('id')

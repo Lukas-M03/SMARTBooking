@@ -187,6 +187,7 @@ class MicrosoftGraphService
      */
     public static function formatBookingAsEvent($booking, User $calendarOwner): array
     {
+        // App stores a single preferred_datetime, so calendar events default to 1 hour.
         $start = $booking->preferred_datetime->copy();
         $end = $booking->preferred_datetime->copy()->addHour();
 
@@ -194,6 +195,7 @@ class MicrosoftGraphService
         $adviserName = $booking->adviser?->name ?? 'Adviser';
         $moduleName = $booking->expertise?->name ?? 'General';
 
+        // Add the other participant as attendee; skip the calendar owner themselves.
         $attendees = collect([$booking->student, $booking->adviser])
             ->filter(fn ($user) => $user && $user->email && $user->id !== $calendarOwner->id)
             ->map(function ($user) {

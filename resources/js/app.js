@@ -33,6 +33,7 @@ calendarElements.forEach((element) => {
 });
 
 function initRegisterForm() {
+	// Only run registration logic on pages that actually have the register form.
 	const registerForm = document.getElementById('registerForm');
 
 	if (!registerForm) {
@@ -48,6 +49,7 @@ function initRegisterForm() {
 	};
 
 	const allAdvisers = parseJsonDataset(registerForm.dataset.advisers, []);
+	// oldModule / oldAdviser let the UI restore previous choices after validation errors.
 	const oldModule = registerForm.dataset.oldModule || '';
 	const oldAdviser = registerForm.dataset.oldAdviser || '';
 
@@ -62,6 +64,8 @@ function initRegisterForm() {
 
 	const setHidden = (element, hidden) => {
 		if (element) {
+			// Keep both class + inline display in sync because custom .form-group CSS
+			// can override Tailwind's .hidden utility.
 			element.classList.toggle('hidden', hidden);
 			element.style.display = hidden ? 'none' : '';
 		}
@@ -97,6 +101,7 @@ function initRegisterForm() {
 			return;
 		}
 
+		// Student selects one module, then advisers are filtered to matching expertise.
 		const selectedModule = parseInt(modulesSelect?.value || oldModule || '', 10);
 		const hasSelectedModule = !Number.isNaN(selectedModule);
 

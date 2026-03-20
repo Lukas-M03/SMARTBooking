@@ -31,16 +31,22 @@ $user ? dd($user->hasMicrosoftToken()) : dd('No users with tokens');
 #### 1. **Azure Portal Setup** (CRITICAL - This is likely why it's not working)
    - [ ] Register app at https://portal.azure.com
    - [ ] Get Client ID, Client Secret, Tenant ID
+  - [ ] Set supported account types to **Any Entra ID tenant + Personal Microsoft accounts**
+  - [ ] Confirm manifest values:
+    - [ ] `signInAudience = AzureADandPersonalMicrosoftAccount`
+    - [ ] `requestedAccessTokenVersion = 2`
    - [ ] Configure API permissions (Calendars.ReadWrite, User.Read, offline_access)
-   - [ ] Grand admin consent to permissions
-   - [ ] Add redirect URI: `http://localhost:8000/auth/callback`
+  - [ ] Grant admin consent to permissions
+  - [ ] Add redirect URI: `http://localhost:8000/auth/callback` (dev)
+  - [ ] Add redirect URI: `https://yourdomain.com/auth/callback` (prod)
 
 #### 2. **Environment Variables** (CRITICAL)
 Update `.env` file:
 ```env
 MICROSOFT_CLIENT_ID=<your_client_id>
 MICROSOFT_CLIENT_SECRET=<your_client_secret>
-MICROSOFT_TENANT_ID=<your_tenant_id>
+MICROSOFT_TENANT_ID=common
+APP_URL=http://localhost:8000
 ```
 
 #### 3. **Database** 
@@ -55,8 +61,9 @@ php artisan migrate
 
 #### 4. **Clear Config Cache**
 ```bash
-php artisan config:cache
+php artisan config:clear
 php artisan cache:clear
+php artisan route:clear
 ```
 
 ---
@@ -81,9 +88,9 @@ php artisan cache:clear
    - **If refresh fails**: Tokens are cleared and user must reconnect
 
 ### 4. **Calendar Events**
-   - Create event: Booking confirmed → Event added to calendar
-   - Update event: Booking status changes → Event updated
-   - Delete event: Booking cancelled → Event removed
+- Create event: Booking created → Event added to connected participant calendars
+- Update event: (not currently wired)
+- Delete event: (not currently wired)
 
 ---
 
@@ -109,7 +116,15 @@ php artisan migrate --path=database/migrations/2026_02_19_000000_add_microsoft_c
 
 **Cause 1: Redirect URI mismatch**
 - Check in Azure Portal → App registration → Authentication
-- Must match exactly with `.env` `MICROSOFT_REDIRECT_URI`
+- Must match exactly with your callback route (`/auth/callback`)
+- Ensure only callback URI is used for OAuth redirect (not root `/`)
+
+**Cause 1b: AADSTS50020 (personal account blocked in tenant)**
+- Set supported account types to Any Entra ID tenant + Personal Microsoft accounts
+- Set `.env` / cloud env: `MICROSOFT_TENANT_ID=common`
+- Verify manifest:
+  - `signInAudience = AzureADandPersonalMicrosoftAccount`
+  - `requestedAccessTokenVersion = 2`
 
 **Cause 2: Missing API permissions**
 - Go to Azure Portal → API permissions
@@ -123,9 +138,23 @@ php artisan migrate --path=database/migrations/2026_02_19_000000_add_microsoft_c
 **Fix**:
 ```bash
 # Clear cached config
-php artisan config:cache
+php artisan config:clear
 php artisan cache:clear
+php artisan route:clear
 ```
+
+---
+
+### Problem: 404 after reconnect/callback
+
+**Cause**: callback success redirect points to a route that does not exist.
+
+**Expected**:
+- Callback route exists: `/auth/callback`
+- Post-callback redirect uses role routes:
+  - `/student/dashboard`
+  - `/adviser/dashboard`
+  - `/admin/dashboard`
 
 ---
 
@@ -211,19 +240,19 @@ $service->createBookingEvent($event);
 ```env
 MICROSOFT_CLIENT_ID=12345678-1234-1234-1234-123456789012
 MICROSOFT_CLIENT_SECRET=abc123...xyz
-MICROSOFT_TENANT_ID=87654321-4321-4321-4321-210987654321
-MICROSOFT_REDIRECT_URI=http://localhost:8000/auth/callback
+MICROSOFT_TENANT_ID=common
+APP_URL=http://localhost:8000
 ```
 
 ### Production
 ```env
 MICROSOFT_CLIENT_ID=<production_client_id>
 MICROSOFT_CLIENT_SECRET=<production_client_secret>
-MICROSOFT_TENANT_ID=<production_tenant_id>
-MICROSOFT_REDIRECT_URI=https://yourdomain.com/auth/callback
+MICROSOFT_TENANT_ID=common
+APP_URL=https://yourdomain.com
 ```
 
-**Important**: Update redirect URI in Azure Portal when deploying!
+**Important**: Update redirect URI in Azure Portal when deploying and ensure callback path is `/auth/callback`.
 
 ---
 
@@ -295,7 +324,7 @@ OUTLOOK_SETUP.md                      ← NEW: Setup instructions
 
 1. **Test the connection** on all dashboard types (student, adviser, admin)
 2. **Create a booking** and verify it appears in Outlook calendar
-3. **Update booking status** and verify calendar event updates
+3. **(Optional)** Add update/delete sync wiring if you want status changes mirrored in Outlook
 4. **Disconnect** and reconnect to verify flow works
 
 ---

@@ -44,6 +44,7 @@ class AuthController extends Controller
 
     public function showRegister()
     {
+        // Modules shown in registration come directly from the expertise table.
         $expertiseList = Expertise::all();
 
         // Load advisers with their expertise so the registration form can
@@ -72,6 +73,7 @@ class AuthController extends Controller
             // Adviser fields
             'expertise_id'         => ['nullable', 'required_if:role,adviser', 'exists:expertise,id'],
             // Student fields
+            // Students pick a single module (same table as adviser expertise).
             'modules'              => ['nullable', 'required_if:role,student', 'exists:expertise,id'],
             'preferred_adviser_id' => ['nullable', 'exists:users,id'],
         ]);
@@ -91,7 +93,7 @@ class AuthController extends Controller
             $user->expertise()->attach($validated['expertise_id']);
         }
 
-        // Attach module interests if the user is a student.
+        // Attach selected student module (single expertise ID) via pivot table.
         if ($validated['role'] === 'student' && !empty($validated['modules'])) {
             $user->modules()->attach($validated['modules']);
         }

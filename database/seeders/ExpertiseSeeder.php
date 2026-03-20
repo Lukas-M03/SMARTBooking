@@ -9,6 +9,7 @@ class ExpertiseSeeder extends Seeder
 {
     public function run(): void
     {
+		// Replace existing module rows so old names are removed from UI dropdowns.
 		Expertise::query()->delete();
 
         $modules = [
@@ -22,6 +23,7 @@ class ExpertiseSeeder extends Seeder
             ['name' => 'Psychology'],
         ];
 
+        // Seed the canonical module list used by student/adviser registration.
         foreach ($modules as $module) {
             Expertise::create($module);
         }
