@@ -82,8 +82,7 @@
             {{-- ── ADVISER: Single module picker ─────────────────────────────── --}}
             <div class="form-group hidden" id="expertiseField">
                 <x-form.label for="expertise_id">Module You Teach</x-form.label>
-                <x-form.select id="expertise_id" name="expertise_id">
-                    <option value="">Select a module</option>
+                <x-form.select id="expertise_id" name="expertise_id" value="" placeholder="Select a module">
                     @foreach ($expertiseList as $expertise)
                         <option value="{{ $expertise->id }}"
                             {{ old('expertise_id') == $expertise->id ? 'selected' : '' }}>

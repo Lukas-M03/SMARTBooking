@@ -322,6 +322,28 @@ td {
     transform: translateY(-2px);
 }
 
+.outlook-buttons a,
+.outlook-buttons button {
+    margin-left: 16px;
+    padding: 8px 8px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+}
+
+.btn-outlookconnect{
+    color: #3dc549;
+    border: 2px solid #3dc549;
+}
+.btn-outlookconnect:hover {
+    background: #3dc549;
+    color: rgb(255, 255, 255);
+    transform: translateY(-2px);
+}
+
 /* =========================
    Layout Content Wrapper
    - Main content container inside the page

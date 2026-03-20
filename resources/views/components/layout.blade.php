@@ -30,7 +30,22 @@
     <!-- Authenticated Navbar -->
     @auth
         <nav class="navbar">
+
+            <div class= "flex items-end gap-4">
             <div class="logo">SMART Booking</div>
+             @auth
+            <div class="outlook-buttons" >
+                @if(Auth::user()->hasMicrosoftToken())
+                    <a href="{{ route('microsoft.disconnect') }}" class="text-red-600 hover:text-red-800">Disconnect</a>
+                @else
+                    <a href="{{ route('microsoft.redirect') }}" class="btn-outlookconnect">
+                        Connect Outlook
+                    </a>
+                @endif
+            </div>
+            @endauth
+            </div>
+
             <button type="button" class="nav-toggle js-nav-toggle" aria-expanded="false" aria-controls="auth-nav-menu"
                 data-target="auth-nav-menu">
                 Menu
