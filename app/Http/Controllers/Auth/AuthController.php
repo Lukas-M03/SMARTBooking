@@ -72,8 +72,7 @@ class AuthController extends Controller
             // Adviser fields
             'expertise_id'         => ['nullable', 'required_if:role,adviser', 'exists:expertise,id'],
             // Student fields
-            'modules'              => ['nullable', 'array'],
-            'modules.*'            => ['exists:expertise,id'],
+            'modules'              => ['nullable', 'required_if:role,student', 'exists:expertise,id'],
             'preferred_adviser_id' => ['nullable', 'exists:users,id'],
         ]);
 

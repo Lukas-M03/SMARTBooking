@@ -2,10 +2,8 @@
     <div class="card max-w-[66.67vw] mx-auto my-12">
         <h1 class="h1">Register</h1>
 
-        <form method="POST" action="{{ route('register') }}" id="registerForm"
-              data-advisers='@json($advisers)'
-              data-old-adviser="{{ old('preferred_adviser_id') }}"
-              data-old-modules='@json(old('modules', []))'>
+        <form method="POST" action="{{ route('register') }}" id="registerForm" data-advisers='@json($advisers)'
+            data-old-adviser="{{ old('preferred_adviser_id') }}" data-old-module="{{ old('modules') }}">
             @csrf
 
             <div class="form-group">
@@ -52,20 +50,18 @@
 
             {{-- ── STUDENT: Module picker ─────────────────────────────────────── --}}
             <div class="form-group hidden" id="modulesField">
-                <x-form.label for="modules_group">Modules / Areas You Need Help With</x-form.label>
-                <input type="hidden" id="modules_group" aria-hidden="true">
+                <x-form.label for="modules">Module / Area You Need Help With</x-form.label>
                 <p class="text-sm text-gray-500 mb-3">
-                    Select one Module — the adviser list below will automatically filter to show advisers who specialise in the area.
+                    Select one module — the adviser list below will automatically filter to show advisers who specialise
+                    in the area.
                 </p>
-                @foreach ($expertiseList as $expertise)
-                    <label class="flex items-center my-1.5 cursor-pointer">
-                        <input type="checkbox" class="module-checkbox w-auto mr-2.5" name="modules[]" value="{{ $expertise->id }}"
-                            {{ is_array(old('modules')) && in_array($expertise->id, old('modules')) ? 'checked' : '' }}>
-                        <span>
-                            <strong>{{ $expertise->name }}</strong>
-                        </span>
-                    </label>
-                @endforeach
+                <x-form.select id="modules" name="modules" value="" placeholder="-Select a Module-">
+                    @foreach ($expertiseList as $expertise)
+                        <option value="{{ $expertise->id }}" {{ old('modules') == $expertise->id ? 'selected' : '' }}>
+                            {{ $expertise->name }}
+                        </option>
+                    @endforeach
+                </x-form.select>
                 <x-form.error name="modules" />
             </div>
 
@@ -75,7 +71,8 @@
                 <p class="text-sm text-gray-500 mb-3" id="adviserHint">
                     Showing all advisers. Select a module above to filter by expertise.
                 </p>
-                <select id="preferred_adviser_id" name="preferred_adviser_id" class="w-full py-2 px-3 border border-gray-300 rounded-md">
+                <select id="preferred_adviser_id" name="preferred_adviser_id"
+                    class="w-full py-2 px-3 border border-gray-300 rounded-md">
                     <option value="">— No preference —</option>
                     {{-- Options are injected by filterAdvisers() on page load --}}
                 </select>
@@ -88,7 +85,8 @@
                 <x-form.select id="expertise_id" name="expertise_id">
                     <option value="">Select a module</option>
                     @foreach ($expertiseList as $expertise)
-                        <option value="{{ $expertise->id }}" {{ old('expertise_id') == $expertise->id ? 'selected' : '' }}>
+                        <option value="{{ $expertise->id }}"
+                            {{ old('expertise_id') == $expertise->id ? 'selected' : '' }}>
                             {{ $expertise->name }}
                         </option>
                     @endforeach

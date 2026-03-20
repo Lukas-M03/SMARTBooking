@@ -9,6 +9,8 @@ class ExpertiseSeeder extends Seeder
 {
     public function run(): void
     {
+		Expertise::query()->delete();
+
         $modules = [
             ['name' => 'Computer Science'],
             ['name' => 'Biology'],

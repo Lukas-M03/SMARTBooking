@@ -48,7 +48,7 @@ function initRegisterForm() {
 	};
 
 	const allAdvisers = parseJsonDataset(registerForm.dataset.advisers, []);
-	const oldModules = parseJsonDataset(registerForm.dataset.oldModules, []);
+	const oldModule = registerForm.dataset.oldModule || '';
 	const oldAdviser = registerForm.dataset.oldAdviser || '';
 
 	const roleSelect = document.getElementById('role');
@@ -58,6 +58,7 @@ function initRegisterForm() {
 	const expertiseField = document.getElementById('expertiseField');
 	const adviserHint = document.getElementById('adviserHint');
 	const adviserSelect = document.getElementById('preferred_adviser_id');
+	const modulesSelect = document.getElementById('modules');
 
 	const setHidden = (element, hidden) => {
 		if (element) {
@@ -96,17 +97,16 @@ function initRegisterForm() {
 			return;
 		}
 
-		const checkedModules = Array.from(
-			document.querySelectorAll('.module-checkbox:checked')
-		).map((checkbox) => parseInt(checkbox.value, 10));
+		const selectedModule = parseInt(modulesSelect?.value || oldModule || '', 10);
+		const hasSelectedModule = !Number.isNaN(selectedModule);
 
-		const filteredAdvisers = checkedModules.length === 0
+		const filteredAdvisers = !hasSelectedModule
 			? allAdvisers
 			: allAdvisers.filter((adviser) =>
-				checkedModules.some((moduleId) => adviser.expertise.includes(moduleId))
+				adviser.expertise.includes(selectedModule)
 			);
 
-		if (checkedModules.length === 0) {
+		if (!hasSelectedModule) {
 			adviserHint.textContent = 'Showing all advisers. Select a module above to filter by expertise.';
 		} else {
 			adviserHint.textContent = filteredAdvisers.length === 0
@@ -130,20 +130,8 @@ function initRegisterForm() {
 		});
 	};
 
-	if (Array.isArray(oldModules) && oldModules.length > 0) {
-		oldModules.forEach((id) => {
-			const checkbox = document.querySelector(`.module-checkbox[value="${id}"]`);
-
-			if (checkbox) {
-				checkbox.checked = true;
-			}
-		});
-	}
-
 	roleSelect?.addEventListener('change', toggleRoleFields);
-	document.querySelectorAll('.module-checkbox').forEach((checkbox) => {
-		checkbox.addEventListener('change', filterAdvisers);
-	});
+	modulesSelect?.addEventListener('change', filterAdvisers);
 
 	toggleRoleFields();
 	filterAdvisers();
