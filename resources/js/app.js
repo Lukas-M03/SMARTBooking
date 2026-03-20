@@ -62,6 +62,7 @@ function initRegisterForm() {
 	const setHidden = (element, hidden) => {
 		if (element) {
 			element.classList.toggle('hidden', hidden);
+			element.style.display = hidden ? 'none' : '';
 		}
 	};
 
