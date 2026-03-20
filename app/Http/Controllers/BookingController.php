@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\User;
 use App\Models\Notification;
+use App\Services\MicrosoftGraphService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -95,7 +97,43 @@ class BookingController extends Controller
             'type' => 'info',
         ]);
 
+        $this->syncBookingToConnectedCalendars($booking);
+
         return redirect()->route('bookings.show', $booking)->with('success', 'Booking request submitted successfully!');
+    }
+
+    /**
+     * Sync a booking event to any connected participant calendars.
+     */
+    private function syncBookingToConnectedCalendars(Booking $booking): void
+    {
+        $booking->loadMissing(['student', 'adviser', 'expertise']);
+
+        $participants = collect([$booking->student, $booking->adviser])
+            ->filter(fn ($user) => $user && $user->hasMicrosoftToken())
+            ->unique('id')
+            ->values();
+
+        foreach ($participants as $participant) {
+            try {
+                $graph = new MicrosoftGraphService($participant);
+                $eventData = MicrosoftGraphService::formatBookingAsEvent($booking, $participant);
+                $eventId = $graph->createBookingEvent($eventData);
+
+                if (!$eventId) {
+                    Log::warning('Booking created but Outlook event was not created.', [
+                        'booking_id' => $booking->id,
+                        'user_id' => $participant->id,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::warning('Booking created but Outlook sync failed.', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $participant->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 
     /**

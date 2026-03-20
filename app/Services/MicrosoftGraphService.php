@@ -185,32 +185,50 @@ class MicrosoftGraphService
     /**
      * Format booking data for calendar event
      */
-    public static function formatBookingAsEvent($booking, $adviser): array
+    public static function formatBookingAsEvent($booking, User $calendarOwner): array
     {
+        $start = $booking->preferred_datetime->copy();
+        $end = $booking->preferred_datetime->copy()->addHour();
+
+        $studentName = $booking->student?->name ?? 'Student';
+        $adviserName = $booking->adviser?->name ?? 'Adviser';
+        $moduleName = $booking->expertise?->name ?? 'General';
+
+        $attendees = collect([$booking->student, $booking->adviser])
+            ->filter(fn ($user) => $user && $user->email && $user->id !== $calendarOwner->id)
+            ->map(function ($user) {
+                return [
+                    'emailAddress' => [
+                        'address' => $user->email,
+                        'name' => $user->name,
+                    ],
+                    'type' => 'required',
+                ];
+            })
+            ->values()
+            ->all();
+
         return [
-            'subject' => "Booking: {$booking->student->name} with {$adviser->name}",
+            'subject' => "SMART Booking: {$booking->topic}",
             'start' => [
-                'dateTime' => $booking->start_time->format('c'),
+                'dateTime' => $start->format('c'),
                 'timeZone' => 'Europe/London',
             ],
             'end' => [
-                'dateTime' => $booking->end_time->format('c'),
+                'dateTime' => $end->format('c'),
                 'timeZone' => 'Europe/London',
             ],
-            'bodyPreview' => "Booking for {$booking->student->name}",
+            'bodyPreview' => "{$studentName} and {$adviserName} • {$moduleName}",
             'body' => [
                 'contentType' => 'HTML',
-                'content' => "<p>Student: {$booking->student->name}</p><p>Email: {$booking->student->email}</p>",
+                'content' => "<p><strong>Topic:</strong> {$booking->topic}</p>"
+                    . "<p><strong>Student:</strong> {$studentName}</p>"
+                    . "<p><strong>Adviser:</strong> {$adviserName}</p>"
+                    . "<p><strong>Module:</strong> {$moduleName}</p>"
+                    . "<p><strong>Type:</strong> {$booking->meeting_type}</p>"
+                    . "<p><strong>Status:</strong> {$booking->status}</p>",
             ],
-            'attendees' => [
-                [
-                    'emailAddress' => [
-                        'address' => $booking->student->email,
-                        'name' => $booking->student->name,
-                    ],
-                    'type' => 'required',
-                ],
-            ],
+            'attendees' => $attendees,
             'isReminderOn' => true,
             'reminderMinutesBeforeStart' => 15,
         ];
