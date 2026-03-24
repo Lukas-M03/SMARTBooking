@@ -95,31 +95,11 @@
                         </button>
                         <div class="mega-menu">
                             <div class="mega-col">
-                                <p class="mega-col-title">Industry Insights</p>
-                                <a href="{{ route('notifications.index') }}" class="mega-link">Notifications Guide</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Booking Best Practices</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Adviser Response Tips</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Student FAQ</a>
-                            </div>
-                            <div class="mega-col">
                                 <p class="mega-col-title">SMART With</p>
                                 <a href="{{ route('bookings.index') }}" class="mega-link">Calendar Sync</a>
                                 <a href="{{ route('bookings.index') }}" class="mega-link">Role-based Access</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Live Alerts</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Data Exports</a>
+                                <a href="{{ route('bookings.index') }}" class="mega-link">Help</a>
                             </div>
-                            <div class="mega-col">
-                                <p class="mega-col-title">For Developers</p>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Routes Overview</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Component Library</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Webhooks</a>
-                                <a href="{{ route('bookings.index') }}" class="mega-link">Troubleshooting</a>
-                            </div>
-                            <a href="{{ route('bookings.index') }}" class="mega-card">
-                                <x-svg icon="calendar-days" size="lg" class="mega-card-icon" />
-                                <span class="mega-card-title">Video Tutorials</span>
-                                <span class="mega-card-sub">Short walkthroughs for teams</span>
-                            </a>
                         </div>
                     </div>
                 </div>
