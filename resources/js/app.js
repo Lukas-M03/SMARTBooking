@@ -149,6 +149,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// All mobile menu toggle buttons (guest + authenticated nav).
 	const toggles = document.querySelectorAll('.js-nav-toggle');
+	const megaToggles = document.querySelectorAll('.js-mega-toggle');
+
+	const closeMegaMenus = () => {
+		document.querySelectorAll('.nav-item-mega').forEach((item) => {
+			item.classList.remove('is-open');
+			const button = item.querySelector('.js-mega-toggle');
+
+			if (button) {
+				button.setAttribute('aria-expanded', 'false');
+			}
+		});
+	};
 
 	toggles.forEach(function (toggle) {
 		toggle.addEventListener('click', function () {
@@ -169,6 +181,27 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
+	megaToggles.forEach((toggle) => {
+		toggle.addEventListener('click', function () {
+			const item = toggle.closest('.nav-item-mega');
+
+			if (!item) {
+				return;
+			}
+
+			const isOpen = item.classList.toggle('is-open');
+			toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+		});
+	});
+
+	document.addEventListener('click', function (event) {
+		if (event.target.closest('.nav-item-mega')) {
+			return;
+		}
+
+		closeMegaMenus();
+	});
+
 	// When resizing to desktop, force mobile menus closed and reset state.
 	window.addEventListener('resize', function () {
 		if (window.innerWidth > 768) {
@@ -180,6 +213,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			toggles.forEach(function (toggle) {
 				toggle.setAttribute('aria-expanded', 'false');
 			});
+
+			closeMegaMenus();
 		}
 	});
 });
