@@ -9,7 +9,7 @@
     };
 
     // Base alert box styling
-    $baseClasses = 'flex items-start gap-3 px-4 py-3 rounded-lg border text-sm font-medium shadow-lg transition-all duration-300 max-w-md fixed right-5 top-20';
+    $baseClasses = 'flex items-start gap-3 px-6 py-5 rounded-lg border text-sm font-medium shadow-lg transition-all duration-300 max-w-md fixed right-5 top-15';
 @endphp
 
 @if ($type)
@@ -34,7 +34,7 @@
             @click="show = false"
             type="button"
             aria-label="Close"
-            class="absolute top-0.5 right-1 px-1 py-0.5 rounded border border-transparent text-black transition-colors duration-200 hover:font-bold hover:cursor-pointer hover:bg-gray-200 hover:border-gray-300 focus:outline-none">
+            class="absolute top-0.3 right-1 px-1 py-0.5 rounded border border-transparent text-black transition-colors duration-200 hover:font-bold hover:cursor-pointer hover:bg-gray-200 hover:border-gray-300 focus:outline-none">
             &times;
         </button>
     </div>

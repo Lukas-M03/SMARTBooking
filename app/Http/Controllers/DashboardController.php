@@ -40,6 +40,7 @@ class DashboardController extends Controller
             'pending' => Booking::where('student_id', $user->id)->where('status', 'pending')->count(),
             'confirmed' => Booking::where('student_id', $user->id)->where('status', 'confirmed')->count(),
             'completed' => Booking::where('student_id', $user->id)->where('status', 'completed')->count(),
+            'notifications_total' => Notification::where('user_id', $user->id)->count(),
         ];
 
         return view('dashboards.student', compact('upcomingBookings', 'recentBookings', 'notifications', 'stats'));
@@ -76,6 +77,7 @@ class DashboardController extends Controller
             'pending' => Booking::where('adviser_id', $user->id)->where('status', 'pending')->count(),
             'confirmed' => Booking::where('adviser_id', $user->id)->where('status', 'confirmed')->count(),
             'completed' => Booking::where('adviser_id', $user->id)->where('status', 'completed')->count(),
+            'notifications_total' => Notification::where('user_id', $user->id)->count(),
         ];
 
         return view('dashboards.adviser', compact('pendingBookings', 'upcomingBookings', 'notifications', 'stats'));

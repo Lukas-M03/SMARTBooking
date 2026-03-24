@@ -1,6 +1,6 @@
 <x-layout>
 <div class="card">
-    <div class="flex justify-between items-start">
+    <div class="flex justify-between items-start gap-4 flex-wrap">
         <div>
             <h1 class="h1-dashboard">Welcome, {{ Auth::user()->name }}!</h1>
             <p class="text-gray-600 mt-2 font-bold">Student Dashboard</p>
@@ -15,8 +15,18 @@
                     @endif
                 </div>
             </div>
+         </div>
+        <div class="text-right ml-auto">
+            <p class="text-sm text-gray-500 mb-2">
+                Total Notifications:
+                <span class="font-semibold text-gray-700">{{ $stats['notifications_total'] }}</span>
+            </p>
+            <a href="{{ route('notifications.index') }}" class="text-blue-600 hover:underline">View All Notifications</a>
+        </div>
+    </div>
+</div>
 
-            <div class="grid-cards">
+<div class="grid-cards">
     <div class="card card-colour1">
         <h3>Total Bookings</h3>
         <p class="card-p">{{ $stats['total'] }}</p>
@@ -34,11 +44,6 @@
         <p class="card-p">{{ $stats['completed'] }}</p>
     </div>
 </div>
-        </div>
-        <div class="flex items-center justify-between gap-4">     
-        </div>
-    </div>
-</div>
 
 <div class="card calendar-card">
     <div class="calendar-header">
@@ -49,6 +54,5 @@
 </div>
 
 @include('bookingsView.studentBooking')
-@include('notifications.studentNotification')
 
 </x-layout>

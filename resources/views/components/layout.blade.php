@@ -71,13 +71,6 @@
     @endauth
 
     <div class="container">
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-error">{{ session('error') }}</div>
-        @endif
-
         <main class="page-content">
             <x-alert />
             {{ $slot }}

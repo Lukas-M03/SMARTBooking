@@ -26,7 +26,7 @@
 
         <!-- Modal header -->        
         @isset($header)
-            <div class="text-lg font-semibold mb-4 border-b border-gray-200">
+            <div class="text-lg font-semibold mb-4 border-b border-gray-200 pb-3">
                 {{ $header }}
             </div>
         @endisset

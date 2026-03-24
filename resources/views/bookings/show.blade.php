@@ -1,5 +1,11 @@
 <x-layout>
-    <div class="card">
+    <div class="card relative pr-14">
+        <a href="{{ route('bookings.index') }}"
+            class="absolute top-4 right-4 inline-flex items-center justify-center rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            aria-label="Close booking details">
+            <x-svg icon="x-mark" size="md" />
+        </a>
+
         <div class="div-show-status">
             <h1 class="h1">Booking Details</h1>
             <span class="span-status"
@@ -48,18 +54,18 @@
         </div>
 
         @if ($booking->adviser_notes)
-            <hr class="border: none; border-top: 1px solid #ddd; margin: 14px 0;">
+            <hr class="border-t border-gray-300 my-4">
             <div>
                 <h3 class="h3-info">Adviser Notes</h3>
-                <p style="background: #fff3cd; padding: 1rem; border-radius: 5px;">{{ $booking->adviser_notes }}</p>
+                <p class="bg-yellow-50 p-4 rounded">{{ $booking->adviser_notes }}</p>
             </div>
         @endif
 
         <hr class="hr-show">
 
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <div class="flex gap-4 flex-wrap">
             @if (Auth::user()->isAdviser() && $booking->status === 'pending')
-                <form method="POST" action="{{ route('bookings.confirm', $booking) }}" style="display: inline;">
+                <form method="POST" action="{{ route('bookings.confirm', $booking) }}" class="inline">
                     @csrf
                     <button type="submit" class="btn btn-success">✓ Confirm Booking</button>
                 </form>
@@ -67,23 +73,33 @@
                 <button onclick="showDenyForm()" class="btn btn-danger">✗ Deny Booking</button>
             @endif
 
-            @if (
-                (($booking->status === 'pending' || $booking->status === 'confirmed') && $booking->student_id === Auth::id()) ||
-                    $booking->adviser_id === Auth::id())
-                <form method="POST" action="{{ route('bookings.cancel', $booking) }}"
-                    onsubmit="return confirm('Are you sure you want to cancel this booking?');">
-                    @csrf
-                    <button type="submit" class="btn btn-warning">Cancel Booking</button>
-                </form>
-            @endif
+            @if ($booking->adviser_id === Auth::id() || (($booking->status === 'pending' || $booking->status === 'confirmed') && $booking->student_id === Auth::id()))
+                <x-modal.open target="cancel-booking" class="btn btn-warning">Cancel Booking</x-modal.open>
 
-            <a href="{{ route('bookings.index') }}" class="btn btn-primary">← Back to Bookings</a>
+                <x-modal.index name="cancel-booking">
+                    <x-slot:header>
+                        Confirm Cancellation
+                    </x-slot:header>
+
+                    <p>Are you sure you want to cancel this booking?</p>
+
+                    <x-slot:footer>
+                        <div class="flex gap-3 justify-end">
+                            <x-modal.close target="cancel-booking" class="btn ">Keep Booking</x-modal.close>
+                            <form method="POST" action="{{ route('bookings.cancel', $booking) }}" class="inline">
+                                @csrf
+                                <button type="submit" class="btn btn-warning">Yes, Cancel</button>
+                            </form>
+                        </div>
+                    </x-slot:footer>
+                </x-modal.index>
+            @endif
         </div>
 
         @if (Auth::user()->isAdviser() && $booking->status === 'pending')
             <div id="denyForm"
-                style="display: none; margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 5px;">
-                <h3 style="margin-bottom: 1rem;">Deny Booking</h3>
+                class="hidden mt-8 p-6 bg-gray-50 rounded">
+                <h3 class="mb-4 font-semibold text-lg">Deny Booking</h3>
                 <form method="POST" action="{{ route('bookings.deny', $booking) }}">
                     @csrf
                     <div class="form-group">
@@ -91,7 +107,7 @@
                         <textarea id="adviser_notes" name="adviser_notes" rows="3"
                             placeholder="Provide a reason for denying this booking..."></textarea>
                     </div>
-                    <div style="display: flex; gap: 1rem;">
+                    <div class="flex gap-4">
                         <button type="submit" class="btn btn-danger">Confirm Denial</button>
                         <button type="button" onclick="hideDenyForm()" class="btn btn-warning">Cancel</button>
                     </div>
