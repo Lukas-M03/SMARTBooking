@@ -21,25 +21,25 @@
                 Total Notifications:
                 <span class="font-semibold text-gray-700">{{ $stats['notifications_total'] }}</span>
             </p>
-            <a href="{{ route('notifications.index') }}" class="text-blue-600 hover:underline">View All Notifications</a>
+            <a href="{{ route('notifications.index') }}" class="nav-link">View All Notifications</a>
         </div>
     </div>
 </div>
 
 <div class="grid-cards">
-    <div class="card card-colour1">
+    <div class="card card-colour">
         <h3>Total Bookings</h3>
         <p class="card-p">{{ $stats['total'] }}</p>
     </div>
-    <div class="card card-colour2">
+    <div class="card card-colour">
         <h3>Pending</h3>
         <p class="card-p">{{ $stats['pending'] }}</p>
     </div>
-    <div class="card card-colour3">
+    <div class="card card-colour">
         <h3>Confirmed</h3>
         <p class="card-p">{{ $stats['confirmed'] }}</p>
     </div>
-    <div class="card card-colour4">
+    <div class="card card-colour">
         <h3>Completed</h3>
         <p class="card-p">{{ $stats['completed'] }}</p>
     </div>
@@ -47,7 +47,7 @@
 
 <div class="card calendar-card">
     <div class="calendar-header">
-        <h3>Adviser Availability + Your Bookings</h3>
+        <h3 class="text-gray-600 mt-2 font-bold">Adviser Availability + Your Bookings</h3>
         <p class="text-gray-600 mt-2">Busy times are shaded and cannot be booked.</p>
     </div>
     <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
