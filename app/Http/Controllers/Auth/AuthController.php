@@ -21,6 +21,10 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Enter a valid email address (example@domain.com).',
+            'password.required' => 'Please enter your password.',
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -38,7 +42,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Incorrect email or password. Please try again.',
+            'password' => 'Incorrect email or password. Please try again.',
         ])->onlyInput('email');
     }
 

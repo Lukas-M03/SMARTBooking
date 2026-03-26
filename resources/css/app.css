@@ -630,7 +630,201 @@ td {
 }
 
 /* =========================
-   09) Responsive Rules
+   09) Login / Register
+   ========================= */
+.login-reference-wrap {
+    min-height: calc(100vh - 240px);
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+}
+
+.login-reference-card {
+    width: min(600px, 100%);
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 48px 36px 34px;
+    box-shadow: 0 20px 45px rgba(17, 24, 39, 0.08);
+    border: 1px solid #ededed;
+}
+
+.login-reference-title {
+    margin: 0 0 32px;
+    font-size: 40px;
+    line-height: 1.18;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    text-align: left;
+}
+
+.login-reference-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.login-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.login-field input {
+    width: 100%;
+    border: 0;
+    background: #f2f2f2;
+    border-radius: 999px;
+    padding: 16px 18px;
+    font-size: 15px;
+    color: #111827;
+}
+
+.login-field label:not(.login-visually-hidden):not(.remember-text) {
+    margin: 0 0 8px;
+    text-transform: none;
+    font-size: 15px;
+    color: #374151;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+}
+
+.login-field select,
+.login-field textarea {
+    width: 100%;
+    border: 0;
+    background: #f2f2f2;
+    border-radius: 999px;
+    padding: 16px 18px;
+    font-size: 15px;
+    color: #111827;
+}
+
+.login-field input::placeholder {
+    color: #8d95a0;
+}
+
+.login-field select::placeholder,
+.login-field textarea::placeholder {
+    color: #8d95a0;
+}
+
+.login-field input:focus {
+    outline: 2px solid rgba(41, 216, 247, 0.35);
+    outline-offset: 1px;
+}
+
+.login-field select:focus,
+.login-field textarea:focus {
+    outline: 2px solid rgba(41, 216, 247, 0.35);
+    outline-offset: 1px;
+}
+
+.login-field-password {
+    position: relative;
+}
+
+.login-field-password input {
+    padding-right: 18px;
+}
+
+.login-options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.remember-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.remember-text {
+    margin: 0 !important;
+    text-transform: none !important;
+    font-size: 15px !important;
+    color: #1f2937 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    line-height: 1;
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.remember-option input[type='checkbox'] {
+    width: 17px;
+    height: 17px;
+    border-radius: 999px;
+    appearance: none;
+    border: 1px solid #d4d4d8;
+    background: #ffffff;
+    display: inline-block;
+}
+
+.remember-option input[type='checkbox']:checked {
+    border-color: rgba(0, 0, 0, 0.35);
+    background: radial-gradient(circle at center, #030100 0 45%, #ffffff 48% 100%);
+}
+
+.forgot-link {
+    font-size: 15px;
+    color: #363636;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.forgot-link:hover {
+    color: #111827;
+}
+
+.login-submit-btn {
+    width: 100%;
+    border-radius: 999px;
+    border: 1px solid rgba(41, 216, 247, 0.35);
+    background: rgba(7, 202, 236, 0.596);
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 14px 18px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 6px;
+}
+
+.login-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 9px 18px rgba(7, 202, 236, 0.596);
+}
+
+.login-submit-btn:focus-visible {
+    outline: 2px solid rgba(41, 216, 247, 0.35);
+    outline-offset: 2px;
+}
+
+.login-field .text-sm.text-red-500.mt-2 {
+    margin-top: 7px;
+    padding-left: 16px;
+    color: #b91c1c;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* =========================
+   10) Responsive Rules
    ========================= */
 @media (max-width: 768px) {
     .navbar {
@@ -743,3 +937,4 @@ td {
         flex-direction: column;
     }
 }
+

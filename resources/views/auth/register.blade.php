@@ -1,35 +1,36 @@
 <x-layout>
-    <div class="card max-w-[66.67vw] mx-auto my-12">
-        <h1 class="h1">Register</h1>
+    <div class="login-reference-wrap">
+        <section class="login-reference-card" aria-labelledby="register-title">
+        <h1 id="register-title" class="login-reference-title">Register</h1>
 
-        <form method="POST" action="{{ route('register') }}" id="registerForm" data-advisers='@json($advisers)'
+        <form method="POST" action="{{ route('register') }}" class="login-reference-form" id="registerForm" data-advisers='@json($advisers)'
             data-old-adviser="{{ old('preferred_adviser_id') }}" data-old-module="{{ old('modules') }}">
             @csrf
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="name">Full Name</x-form.label>
                 <x-form.input type="text" name="name" value="{{ old('name') }}" required />
                 <x-form.error name="name" />
             </div>
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="email">Email Address</x-form.label>
                 <x-form.input type="email" name="email" value="{{ old('email') }}" required />
                 <x-form.error name="email" />
             </div>
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="password">Password</x-form.label>
                 <x-form.input type="password" name="password" required />
                 <x-form.error name="password" />
             </div>
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="password_confirmation">Confirm Password</x-form.label>
                 <x-form.input type="password" name="password_confirmation" required />
             </div>
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="role">I am a</x-form.label>
                 <x-form.select id="role" name="role" required>
                     <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>Student</option>
@@ -38,18 +39,18 @@
                 <x-form.error name="role" />
             </div>
 
-            <div class="form-group hidden" id="studentIdField">
+            <div class="login-field hidden" id="studentIdField">
                 <x-form.label for="student_id">Student ID (Optional)</x-form.label>
                 <x-form.input type="text" name="student_id" value="{{ old('student_id') }}" />
             </div>
 
-            <div class="form-group">
+            <div class="login-field">
                 <x-form.label for="phone">Phone Number (Optional)</x-form.label>
                 <x-form.input type="text" name="phone" value="{{ old('phone') }}" />
             </div>
 
             {{-- ── STUDENT: Module picker ─────────────────────────────────────── --}}
-            <div class="form-group hidden" id="modulesField">
+            <div class="login-field hidden" id="modulesField">
                 <x-form.label for="modules">Module / Area You Need Help With</x-form.label>
                 <p class="text-sm text-gray-500 mb-3">
                     Select one module — the adviser list below will automatically filter to show advisers who specialise
@@ -66,13 +67,12 @@
             </div>
 
             {{-- ── STUDENT: Adviser picker (filtered by selected modules) ────── --}}
-            <div class="form-group hidden" id="adviserField">
+            <div class="login-field hidden" id="adviserField">
                 <x-form.label for="preferred_adviser_id">Choose Your Adviser (Optional)</x-form.label>
                 <p class="text-sm text-gray-500 mb-3" id="adviserHint">
                     Showing all advisers. Select a module above to filter by expertise.
                 </p>
-                <select id="preferred_adviser_id" name="preferred_adviser_id"
-                    class="w-full py-2 px-3 border border-gray-300 rounded-md">
+                <select id="preferred_adviser_id" name="preferred_adviser_id">
                     <option value="">— No preference —</option>
                     {{-- Options are injected by filterAdvisers() on page load --}}
                 </select>
@@ -80,7 +80,7 @@
             </div>
 
             {{-- ── ADVISER: Single module picker ─────────────────────────────── --}}
-            <div class="form-group hidden" id="expertiseField">
+            <div class="login-field hidden" id="expertiseField">
                 <x-form.label for="expertise_id">Module You Teach</x-form.label>
                 <x-form.select id="expertise_id" name="expertise_id" value="" placeholder="Select a module">
                     @foreach ($expertiseList as $expertise)
@@ -93,12 +93,13 @@
                 <x-form.error name="expertise_id" />
             </div>
 
-            <button type="submit" class="btn btn-primary w-full">Register</button>
+            <button type="submit" class="login-submit-btn">Register</button>
 
             <p class="text-center mt-6">
-                Already have an account? <a href="{{ route('login') }}" class="text-indigo-500">Login here</a>
+                Already have an account? <a href="{{ route('login') }}" class="forgot-link">Login here</a>
             </p>
         </form>
+        </section>
     </div>
 
 </x-layout>
