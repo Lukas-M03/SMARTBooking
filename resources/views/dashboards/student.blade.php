@@ -8,7 +8,7 @@
                 <h3 class="text-gray-600">Microsoft Outlook Calendar</h3>
                 <div class="text-gray-600 mt-2">
                     @if(Auth::user()->hasMicrosoftToken())
-                        <span class="text-green-700 font-semibold">✓ Connected</span>
+                        <span class="text-green-700 font-semibold">Connected</span>
                         <p class="text-sm text-gray-500 mt-1">Your bookings will automatically sync to Outlook</p>
                     @else
                         <span class="text-orange-700">Not Connected</span>
@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<div class="card calendar-card">
+<div class="calendar-card-info calendar-card">
     <div class="calendar-header">
         <h3 class="text-gray-600 mt-2 font-bold">Adviser Availability + Your Bookings</h3>
         <p class="text-gray-600 mt-2">Busy times are shaded and cannot be booked.</p>

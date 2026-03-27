@@ -36,4 +36,19 @@ class NotificationController extends Controller
 
         return back()->with('success', 'All notifications marked as read.');
     }
+
+    public function destroy($id)
+    {
+        $notification = NotificationModel::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        $notification->delete();
+        return back()->with('success', 'Notification deleted successfully.');
+    }
+
+    public function deleteAll()
+    {
+        NotificationModel::where('user_id', Auth::id())->delete();
+        return back()->with('success', 'All notifications deleted successfully.');
+    }
 }

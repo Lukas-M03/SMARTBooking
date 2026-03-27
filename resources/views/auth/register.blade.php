@@ -9,25 +9,25 @@
 
             <div class="login-field">
                 <x-form.label for="name">Full Name</x-form.label>
-                <x-form.input type="text" name="name" value="{{ old('name') }}" required />
+                <x-form.input type="text" name="name" value="{{ old('name') }}" required placeholder="Full Name" />
                 <x-form.error name="name" />
             </div>
 
             <div class="login-field">
                 <x-form.label for="email">Email Address</x-form.label>
-                <x-form.input type="email" name="email" value="{{ old('email') }}" required />
+                <x-form.input type="email" name="email" value="{{ old('email') }}" required placeholder="Email Address" />
                 <x-form.error name="email" />
             </div>
 
             <div class="login-field">
                 <x-form.label for="password">Password</x-form.label>
-                <x-form.input type="password" name="password" required />
+                <x-form.input type="password" name="password" required placeholder="Password" />
                 <x-form.error name="password" />
             </div>
 
             <div class="login-field">
                 <x-form.label for="password_confirmation">Confirm Password</x-form.label>
-                <x-form.input type="password" name="password_confirmation" required />
+                <x-form.input type="password" name="password_confirmation" required placeholder="Confirm Password" />
             </div>
 
             <div class="login-field">
@@ -41,22 +41,22 @@
 
             <div class="login-field hidden" id="studentIdField">
                 <x-form.label for="student_id">Student ID (Optional)</x-form.label>
-                <x-form.input type="text" name="student_id" value="{{ old('student_id') }}" />
+                <x-form.input type="text" name="student_id" value="{{ old('student_id') }}" placeholder="Student ID (Optional)" />
             </div>
 
             <div class="login-field">
                 <x-form.label for="phone">Phone Number (Optional)</x-form.label>
-                <x-form.input type="text" name="phone" value="{{ old('phone') }}" />
+                <x-form.input type="text" name="phone" value="{{ old('phone') }}" placeholder="Phone Number (Optional)" />
             </div>
 
             {{-- ── STUDENT: Module picker ─────────────────────────────────────── --}}
             <div class="login-field hidden" id="modulesField">
                 <x-form.label for="modules">Module / Area You Need Help With</x-form.label>
-                <p class="text-sm text-gray-500 mb-3">
+                <p class="text-sm text-gray-500 mb-4">
                     Select one module — the adviser list below will automatically filter to show advisers who specialise
                     in the area.
                 </p>
-                <x-form.select id="modules" name="modules" value="" placeholder="-Select a Module-">
+                <x-form.select id="modules" name="modules" value="" placeholder="-Select a Module-" >
                     @foreach ($expertiseList as $expertise)
                         <option value="{{ $expertise->id }}" {{ old('modules') == $expertise->id ? 'selected' : '' }}>
                             {{ $expertise->name }}

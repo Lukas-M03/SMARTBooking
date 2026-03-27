@@ -177,9 +177,9 @@ td {
     align-items: center;
     justify-content: center;
     border-radius: 999px;
-    background: #0b0b0f;
+    background: #84848a;
     color: #ffffff;
-    border: 1px solid #0b0b0f;
+    border: 1px solid #707072;
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
@@ -348,6 +348,16 @@ td {
     margin-bottom: 25px;
 }
 
+.calendar-card-info{
+    background: #ffffff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 66.67vw;
+    margin: 30px auto;
+}
+
 .calendar-card {
     margin-bottom: 25px;
 }
@@ -357,22 +367,26 @@ td {
 }
 
 .booking-calendar {
-    background: #313030;
-    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    border: 1px solid #000000;
     border-radius: 10px;
     padding: 12px;
 }
 
 .booking-calendar .fc-toolbar-title {
-    font-size: 17px;
+    font-size: 20px;
     color: #111827;
+    font-weight: 600;
+
 }
 
 .booking-calendar .fc-button {
-    background: #1f2937;
+    background: #7d7f83;
     border-color: #1f2937;
     font-size: 14px;
     margin-right: 4px;
+    border-radius: 999px;
+    width: 100px;
 }
 
 .booking-calendar .fc-button:hover {
@@ -382,7 +396,33 @@ td {
 
 .booking-calendar .fc-daygrid-day-number {
     color: #1f2937;
+    font-weight: 600;
 }
+
+.booking-calendar .fc-daygrid-event {
+    background: #66cece;
+    border: 1px solid #4a66e7;
+    color: white;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+.booking-calendar .fc-daygrid-event:hover {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+.booking-calendar .fc-daygrid-event .fc-event-title {
+    padding: 2px 4px;
+}
+
+.booking-calendar .fc-toolbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
 
 .div-show-status {
     display: flex;
@@ -473,6 +513,24 @@ td {
     font-weight: bold;
 }
 
+.btn-success {
+    background: #28a745;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    font-weight: bold;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: #333;
+    font-weight: bold;
+}
+
 .btn-primary:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -488,6 +546,21 @@ td {
 .btn-secondary:hover {
     background: white;
     color: #667eea;
+}
+
+.btn-success:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn-danger:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn-warning:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .features {
@@ -535,9 +608,15 @@ td {
     margin: 30px auto;
 }
 
+.card-colour:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .card-colour {
-    background: linear-gradient(135deg, #3b3b3e 0%, #b7b4ba 100%);
+    background: linear-gradient(135deg, #84848a 0%, #b7b4ba 100%);
     color: white;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card-p {
@@ -608,7 +687,7 @@ td {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 24px;
+    padding: 9px 12px;
     border-radius: 6px;
     border: 0;
     cursor: pointer;
@@ -883,7 +962,7 @@ td {
     }
 
     .btn-pill-dark {
-        color: #0b0b0f;
+        color: #84848a;
         border-color: #d1d5db;
     }
 

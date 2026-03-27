@@ -1,41 +1,42 @@
 <div class="card">
-    <div class="card-upcoming-bookings">
-        <h2>Upcoming Bookings</h2>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="font-bold text-lg">Upcoming Bookings</h2>
         <a href="{{ route('bookings.create') }}" class="btn btn-primary">+ New Booking</a>
     </div>
 
-    @if($upcomingBookings->count() > 0)
-        <table style="width: 100%; border-collapse: collapse;">
+    @if ($upcomingBookings->count() > 0)
+        <table class="w-full border-collapse">
             <thead>
-                <tr class="border-bottom: 2px solid #ddd;">
-                    <th style="padding: 1rem; text-align: left;">Topic</th>
-                    <th style="padding: 1rem; text-align: left;">Adviser</th>
-                    <th style="padding: 1rem; text-align: left;">Date & Time</th>
-                    <th style="padding: 1rem; text-align: left;">Status</th>
-                    <th style="padding: 1rem; text-align: left;">Actions</th>
+                <tr class="border-b-2 border-gray-300">
+                    <th class="py-4 px-4 text-left">Topic</th>
+                    <th class="py-4 px-4 text-left">Adviser</th>
+                    <th class="py-4 px-4 text-left">Date & Time</th>
+                    <th class="py-4 px-4 text-left">Status</th>
+                    <th class="py-4 px-4 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($upcomingBookings as $booking)
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 1rem;">{{ $booking->topic }}</td>
-                    <td style="padding: 1rem;">{{ $booking->adviser->name }}</td>
-                    <td style="padding: 1rem;">{{ $booking->preferred_datetime->format('M d, Y - H:i') }}</td>
-                    <td style="padding: 1rem;">
-                        <span style="padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.875rem; 
-                            background: {{ $booking->status === 'confirmed' ? '#28a745' : '#ffc107' }}; 
-                            color: {{ $booking->status === 'confirmed' ? 'white' : '#333' }};">
-                            {{ ucfirst($booking->status) }}
-                        </span>
-                    </td>
-                    <td style="padding: 1rem;">
-                        <a href="{{ route('bookings.show', $booking) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">View</a>
-                    </td>
-                </tr>
+                @foreach ($upcomingBookings as $booking)
+                    <tr class="border-b border-gray-200">
+                        <td class="py-4 px-4">{{ $booking->topic }}</td>
+                        <td class="py-4 px-4">{{ $booking->adviser->name }}</td>
+                        <td class="py-4 px-4">{{ $booking->preferred_datetime->format('M d, Y - H:i') }}</td>
+                        <td class="py-4 px-4">
+                            <span class="span-status"
+                                style="background: {{ $booking->status === 'confirmed' ? '#28a745' : ($booking->status === 'pending' ? '#ffc107' : ($booking->status === 'denied' ? '#dc3545' : '#6c757d')) }}; color: {{ $booking->status === 'pending' ? '#333' : 'white' }};">
+                                {{ ucfirst($booking->status) }}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <a href="{{ route('bookings.show', $booking) }}"
+                                class="btn btn-primary text-sm py-3 px-5">View</a>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
     @else
-        <p class="text-center text-gray-500 p-8">No upcoming bookings. <a href="{{ route('bookings.create') }}" class="text-blue-600 hover:underline">Create your first booking!</a></p>
+        <p class="text-center text-gray-500 p-8">No upcoming bookings. <a href="{{ route('bookings.create') }}"
+                class="text-blue-600 hover:underline">Create your first booking!</a></p>
     @endif
 </div>

@@ -18,9 +18,9 @@ calendarElements.forEach((element) => {
 			method: 'GET',
 		},
 		headerToolbar: {
-			left: 'prev,next today',
+			left: 'prev',
 			center: 'title',
-			right: '',
+			right: 'next today',
 		},
 		eventTimeFormat: {
 			hour: '2-digit',

@@ -18,21 +18,24 @@ class BookingController extends Controller
      * Advisers see bookings where they are the adviser.
      * Results are ordered by preferred_datetime in descending order.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $status = $request->query('status');
         
         if ($user->isStudent()) {
-            $bookings = Booking::where('student_id', $user->id)
-                ->with(['adviser', 'expertise'])
-                ->orderBy('preferred_datetime', 'desc')
-                ->get();
+            $query = Booking::where('student_id', $user->id)
+                ->with(['adviser', 'expertise']);
         } else {
-            $bookings = Booking::where('adviser_id', $user->id)
-                ->with(['student', 'expertise'])
-                ->orderBy('preferred_datetime', 'desc')
-                ->get();
+            $query = Booking::where('adviser_id', $user->id)
+                ->with(['student', 'expertise']);
         }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        $bookings = $query->orderBy('preferred_datetime', 'asc')->get();
 
         return view('bookings.index', compact('bookings'));
     }
@@ -310,5 +313,39 @@ class BookingController extends Controller
         ]);
 
         return back()->with('success', 'Booking cancelled successfully.');
+    }
+
+    /**
+     * Delete a booking (adviser only, for denied or cancelled bookings).
+     */
+    public function destroy(Booking $booking)
+    {
+        $user = Auth::user();
+        if ($booking->adviser_id !== $user->id || !in_array($booking->status, ['denied', 'cancelled', 'canceled'])) {
+            abort(403);
+        }
+        $booking->delete();
+        return back()->with('success', 'Booking deleted successfully.');
+    }
+
+    /**
+     * Mark a booking as completed (adviser only, for confirmed bookings).
+     */
+    public function complete(Booking $booking)
+    {
+        $user = Auth::user();
+        if ($booking->adviser_id !== $user->id || $booking->status !== 'confirmed') {
+            abort(403);
+        }
+        $booking->update(['status' => 'completed']);
+        // Optionally, notify the student
+        Notification::create([
+            'user_id' => $booking->student_id,
+            'booking_id' => $booking->id,
+            'title' => 'Booking Completed',
+            'message' => "Your booking for '" . $booking->topic . "' has been marked as completed.",
+            'type' => 'success',
+        ]);
+        return back()->with('success', 'Booking marked as completed.');
     }
 }

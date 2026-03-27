@@ -53,7 +53,7 @@
                     <td class="td">{{ $booking->preferred_datetime->format('M d, Y - H:i') }}</td>
                     <td class="td">{{ ucfirst($booking->meeting_type) }}</td>
                     <td class="td">
-                        <a href="{{ route('bookings.show', $booking) }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">View</a>
+                        <a href="{{ route('bookings.show', $booking) }}" class="btn btn-primary">View</a>
                     </td>
                 </tr>
                 @endforeach

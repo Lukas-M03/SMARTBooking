@@ -69,18 +69,27 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name'                 => ['required', 'string', 'max:255'],
-            'email'                => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'name'                 => ['required', 'string', 'max:20'],
+            'email'                => ['required', 'string', 'email', 'max:30', 'unique:users'],
             'password'             => ['required', 'string', 'min:8', 'confirmed'],
             'role'                 => ['required', 'in:student,adviser'],
-            'student_id'           => ['nullable', 'string', 'max:50'],
+            'student_id'           => ['nullable', 'string', 'max:9', 'regex:/^B\d{8}$/'],
             'phone'                => ['nullable', 'string', 'max:20'],
             // Adviser fields
             'expertise_id'         => ['nullable', 'required_if:role,adviser', 'exists:expertise,id'],
             // Student fields
-            // Students pick a single module (same table as adviser expertise).
             'modules'              => ['nullable', 'required_if:role,student', 'exists:expertise,id'],
             'preferred_adviser_id' => ['nullable', 'exists:users,id'],
+        ], [
+            'name.required'                 => 'Please enter your full name.',
+            'role.required'                 => 'Please select whether you are a student or adviser.',
+            'role.in'                       => 'Please select a valid role.',
+            'student_id.regex'              => 'Student ID must be in the format "B00000000".',
+            'modules.required_if'           => 'Please select a module/area you need help with.',
+            'modules.exists'                => 'Please select a valid module.',
+            'preferred_adviser_id.exists'    => 'Please select a valid adviser.',
+            'expertise_id.required_if'      => 'Please select the module you teach.',
+            'expertise_id.exists'           => 'Please select a valid module.',
         ]);
 
         $user = User::create([

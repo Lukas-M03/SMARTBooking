@@ -39,7 +39,7 @@
             </div>
 
             <div class="display-flex gap-16px" style="justify-content: space-between;">
-                <button type="submit" class="btn btn-primary flex-1" >Submit Booking Request</button>
+                <button type="submit" class="btn btn-primary flex-1">Submit Booking Request</button>
                 <a href="{{ route('student.dashboard') }}" class="btn btn-warning">Cancel</a>
             </div>
         </form>

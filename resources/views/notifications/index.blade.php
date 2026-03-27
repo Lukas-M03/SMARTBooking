@@ -23,9 +23,16 @@
                     @if (!$notification->is_read)
                         <form method="POST" action="{{ route('notifications.mark-read', $notification->id) }}">
                             @csrf
-                            <button type="submit" class="bg-transparent border-none text-indigo-500 cursor-pointer text-sm underline">
+                            <button type="submit" class="bg-transparent border-none text-indigo-500 cursor-pointer text-base underline">
                                 Mark as read
                             </button>
+                        </form>
+                    @endif
+                    @if ($notification->is_read)
+                        <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}" onsubmit="return confirm('Are you sure you want to delete this notification?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="ml-4 text-red-500 hover:text-red-400 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete</button>
                         </form>
                     @endif
                 </div>
@@ -33,6 +40,13 @@
 
             <div class="mt-7">
                 {{ $notifications->links() }}
+            </div>
+            <div class="mt-7 flex justify-end">
+                <form method="POST" action="{{ route('notifications.delete-all') }}" onsubmit="return confirm('Are you sure you want to delete all notifications?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="hover:text-red-400 text-red-600 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete All Notifications</button>
+                </form>
             </div>
         @else
             <p class="text-center text-gray-400 p-7">No notifications yet.</p>

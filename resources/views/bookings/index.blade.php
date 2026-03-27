@@ -37,14 +37,25 @@
                             <td class="td">{{ $booking->preferred_datetime->format('M d, Y - H:i') }}</td>
                             <td class="td">{{ ucfirst($booking->meeting_type) }}</td>
                             <td class="td">
-                                <span class="span-status-adviser"
-                                    style="background: {{ $booking->status === 'confirmed' ? '#28a745' : ($booking->status === 'pending' ? '#ffc107' : ($booking->status === 'denied' ? '#dc3545' : '#6c757d')) }}; color: {{ $booking->status === 'pending' ? '#333' : 'white' }};">
+                                <span class="span-status"
+                                    style="background: {{
+                                        $booking->status === 'confirmed' ? '#28a745' :
+                                        ($booking->status === 'pending' ? '#ffc107' :
+                                        ($booking->status === 'denied' ? '#dc3545' :
+                                        ($booking->status === 'completed' ? '#2563eb' : '#6c757d')))
+                                    }}; color: {{ $booking->status === 'pending' ? '#333' : 'white' }};">
                                     {{ ucfirst($booking->status) }}
                                 </span>
                             </td>
                             <td class="td">
-                                <a href="{{ route('bookings.show', $booking) }}" class="btn btn-primary"
-                                    style="padding: 7px 14px; font-size: 14px;">View</a>
+                                <a href="{{ route('bookings.show', $booking) }}" class="mr-4 text-indigo-500 hover:text-indigo-400 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">View</a>
+                                @if (Auth::user()->isAdviser() && in_array($booking->status, ['denied', 'cancelled']))
+                                    <form method="POST" action="{{ route('bookings.destroy', $booking) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this booking?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="ml-4 text-red-500 hover:text-red-400 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete</button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

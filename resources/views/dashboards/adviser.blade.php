@@ -1,64 +1,61 @@
 <x-layout>
-<div class="card">
-    <h1 class="h1-dashboard">Welcome, {{ Auth::user()->name }}!</h1>
-    <p class="text-gray-600 mt-2">Studies Adviser Dashboard</p>
-</div>
-
-<!-- Microsoft Calendar Connection -->
-<div class="card border-l-4 border-[#0078d4]">
-    <div class="flex items-center justify-between">
-        <div>
-            <h3 class="m-0">Microsoft Outlook Calendar</h3>
-            <div class="text-gray-600 mt-2">
-                @if(Auth::user()->hasMicrosoftToken())
-                    <span class="text-green-700 font-semibold">✓ Connected</span>
-                    <p class="text-sm text-gray-500 mt-1">Your bookings will automatically sync to Outlook</p>
-                @else
-                    <span class="text-orange-700">Not Connected</span>
-                    <p class="text-sm text-gray-500 mt-1">Connect your Outlook calendar to sync bookings automatically</p>
-                @endif
+    <div class="card">
+        <div class="flex justify-between items-start gap-4 flex-wrap">
+            <div>
+                <h1 class="h1-dashboard">Welcome, {{ Auth::user()->name }}!</h1>
+                <p class="text-gray-600 mt-2 font-bold">Adviser Dashboard</p>
+                <div>
+                    <h3 class="text-gray-600">Microsoft Outlook Calendar</h3>
+                    <div class="text-gray-600 mt-2">
+                        @if (Auth::user()->hasMicrosoftToken())
+                            <span class="text-green-700 font-semibold">Connected</span>
+                            <p class="text-sm text-gray-500 mt-1">Your bookings will automatically sync to Outlook</p>
+                        @else
+                            <span class="text-orange-700">Not Connected</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="text-right ml-auto">
+                <p class="text-sm text-gray-500 mb-2">
+                    Total Notifications:
+                    <span class="font-semibold text-gray-700">{{ $stats['notifications_total'] }}</span>
+                </p>
+                <a href="{{ route('notifications.index') }}" class="nav-link">View All Notifications</a>
             </div>
         </div>
-        <div>
-            @if(Auth::user()->hasMicrosoftToken())
-                <a href="{{ route('microsoft.disconnect') }}" class="text-red-600 hover:text-red-800">Disconnect</a>
-            @else
-                <a href="{{ route('microsoft.redirect') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                    Connect Outlook
-                </a>
-            @endif
+    </div>
+
+    <div class="grid-cards">
+        <a href="{{ route('bookings.index') }}" class="card card-colour">
+            <h3>Total Bookings</h3>
+            <p class="card-p">{{ $stats['total'] }}</p>
+        </a>
+        
+        <a href="{{ route('bookings.index', ['status' => 'pending']) }}" class="card card-colour">
+            <h3>Pending Requests</h3>
+            <p class="card-p">{{ $stats['pending'] }}</p>
+        </a>
+
+        <a href="{{ route('bookings.index', ['status' => 'confirmed']) }}" class="card card-colour">
+            <h3>Confirmed</h3>
+            <p class="card-p">{{ $stats['confirmed'] }}</p>
+        </a>
+
+        <div class="card card-colour">
+            <h3>Completed</h3>
+            <p class="card-p">{{ $stats['completed'] }}</p>
         </div>
     </div>
-</div>
 
-<div class="grid-cards">
-    <div class="card card-colour1">
-        <h3>Total Bookings</h3>
-        <p class="card-p">{{ $stats['total'] }}</p>
+    <div class="calendar-card-info calendar-card">
+        <div class="calendar-header">
+            <h3 class="text-gray-600 mt-2 font-bold">Your Bookings Calendar</h3>
+            <p class="text-gray-600 mt-2">All your booking requests and confirmed sessions.</p>
+        </div>
+        <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
     </div>
-    <div class="card card-colour2">
-        <h3>Pending Requests</h3>
-        <p class="card-p">{{ $stats['pending'] }}</p>
-    </div>
-    <div class="card card-colour3">
-        <h3>Confirmed</h3>
-        <p class="card-p">{{ $stats['confirmed'] }}</p>
-    </div>
-    <div class="card card-colour4">
-        <h3>Completed</h3>
-        <p class="card-p">{{ $stats['completed'] }}</p>
-    </div>
-</div>
 
-<div class="card calendar-card">
-    <div class="calendar-header">
-        <h3>Your Bookings Calendar</h3>
-        <p class="text-gray-600 mt-2">All your booking requests and confirmed sessions.</p>
-    </div>
-    <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
-</div>
-
-@include('bookingsView.adviserBooking')
-@include('notifications.adviserNotification')
+    @include('bookingsView.adviserBooking')
 
 </x-layout>
