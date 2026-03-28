@@ -296,15 +296,41 @@ td {
 }
 
 .nav-buttons a:not(.btn-pill-dark), 
-.nav-buttons button:not(.btn-pill-dark) {
+/* Desktop: No border, no border-radius */
+.nav-buttons button:not(.btn-pill-dark),
+.nav-buttons a:not(.btn-pill-dark) {
     margin-left: 0;
-    padding: 0;
+    padding: 8px 18px;
     text-decoration: none;
-    border-radius: 0;
+    border-radius: 0 !important;
     transition: all 0.3s;
     background: transparent;
     cursor: pointer;
     font: inherit;
+    border: none;
+}
+
+.nav-buttons button:not(.btn-pill-dark):hover,
+.nav-buttons a:not(.btn-pill-dark):hover {
+    border-color: #667eea;
+}
+
+@media (max-width: 768px) {
+    .nav-buttons button:not(.btn-pill-dark),
+    .nav-buttons a:not(.btn-pill-dark) {
+        border-radius: 999px !important;
+        border: 1.5px solid #e5e7eb;
+        background: #fff;
+        width: 100%;
+        display: block;
+        margin: 0;
+        padding: 10px 12px;
+        text-align: left;
+    }
+    .nav-buttons button:not(.btn-pill-dark):hover,
+    .nav-buttons a:not(.btn-pill-dark):hover {
+        border-color: #667eea;
+    }
 }
 
 /* =========================
@@ -419,7 +445,19 @@ td {
     margin-right: 4px;
     border-radius: 999px;
     width: 80px;
+    padding: 8px 0;
+    transition: all 0.2s;
 }
+
+@media (max-width: 700px) {
+    .booking-calendar .fc-button {
+        width: 48px;
+        font-size: 12px;
+        padding: 6px 0;
+        min-width: 0;
+    }
+}
+
 
 .booking-calendar .fc-button:hover {
     background: #111827;
