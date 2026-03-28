@@ -29,7 +29,6 @@ class BookingController extends Controller
         ]);
         return back()->with('success', 'Comment updated successfully.');
     }
-{
     /**
      * Retrieve all bookings for the authenticated user.
      * Students see bookings where they are the student.
