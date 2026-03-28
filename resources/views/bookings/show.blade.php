@@ -134,7 +134,6 @@
                     }
                 </script>
             @endif
-            @endif
         </div>
 
         @if (Auth::user()->isAdviser() && $booking->status === 'pending')
