@@ -71,9 +71,11 @@
 
         <div class="flex gap-4 flex-wrap">
                         @if (Auth::user()->isAdviser() && $booking->status === 'completed')
-                            <button onclick="showEditCommentForm()" class="btn btn-primary">Edit Comment</button>
-                            <div id="editCommentForm" class="hidden mt-8 p-6 bg-gray-50 rounded">
-                                <h3 class="mb-4 mt-4 font-semibold text-lg">Edit Completed Meeting Comment</h3>
+                            <x-modal.open target="edit-comment-modal" class="btn btn-primary">Edit Comment</x-modal.open>
+                            <x-modal.index name="edit-comment-modal">
+                                <x-slot:header>
+                                    Edit Completed Meeting Comment
+                                </x-slot:header>
                                 <form method="POST" action="{{ route('bookings.updateComment', $booking) }}">
                                     @csrf
                                     @method('PUT')
@@ -81,20 +83,12 @@
                                         <label for="adviser_notes_edit">Comment</label>
                                         <textarea id="adviser_notes_edit" name="adviser_notes" rows="3" placeholder="Add or edit your comment...">{{ $booking->adviser_notes }}</textarea>
                                     </div>
-                                    <div class="flex gap-4">
+                                    <div class="flex gap-4 mt-4">
                                         <button type="submit" class="btn btn-success">Save Comment</button>
-                                        <button type="button" onclick="hideEditCommentForm()" class="btn btn-warning">Cancel</button>
+                                        <x-modal.close target="edit-comment-modal" class="btn btn-warning">Cancel</x-modal.close>
                                     </div>
                                 </form>
-                            </div>
-                            <script>
-                                function showEditCommentForm() {
-                                    document.getElementById('editCommentForm').style.display = 'block';
-                                }
-                                function hideEditCommentForm() {
-                                    document.getElementById('editCommentForm').style.display = 'none';
-                                }
-                            </script>
+                            </x-modal.index>
                         @endif
             @if (Auth::user()->isAdviser() && $booking->status === 'pending')
                 <form method="POST" action="{{ route('bookings.confirm', $booking) }}" class="inline">
