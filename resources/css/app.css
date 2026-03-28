@@ -150,7 +150,7 @@ td {
 .nav-main-links {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 9px;
 }
 
 .nav-utility-links {
@@ -295,8 +295,8 @@ td {
     font-weight: 600;
 }
 
-.nav-buttons a:not(.btn-pill-dark), 
 /* Desktop: No border, no border-radius */
+.nav-buttons a:not(.btn-pill-dark), 
 .nav-buttons button:not(.btn-pill-dark),
 .nav-buttons a:not(.btn-pill-dark) {
     margin-left: 0;

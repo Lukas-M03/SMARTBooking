@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="card">
+    <div class="card" style="max-width: 1000px; margin: 30px auto;">
         <div class="div-mybookings">
             <h1 class="h1-dashboard">My Bookings</h1>
             @if (Auth::user()->isStudent())
@@ -8,7 +8,7 @@
         </div>
 
         @if ($bookings->count() > 0)
-            <div class="table-responsive">
+            <div class="table-responsive" style="overflow-x: auto;">
                 <table class="w-full border-collapse min-w-[700px]">
                 <thead>
                     <tr class="tr">
