@@ -337,8 +337,13 @@ class BookingController extends Controller
         if ($booking->adviser_id !== $user->id || $booking->status !== 'confirmed') {
             abort(403);
         }
-        $booking->update(['status' => 'completed']);
-        // Optionally, notify the student
+
+        $adviser_notes = request()->input('adviser_notes');
+        $booking->update([
+            'status' => 'completed',
+            'adviser_notes' => $adviser_notes,
+        ]);
+
         Notification::create([
             'user_id' => $booking->student_id,
             'booking_id' => $booking->id,

@@ -42,10 +42,10 @@
             <p class="card-p">{{ $stats['confirmed'] }}</p>
         </a>
 
-        <div class="card card-colour">
+        <a href="{{ route('bookings.index', ['status' => 'completed']) }}" class="card card-colour">
             <h3>Completed</h3>
             <p class="card-p">{{ $stats['completed'] }}</p>
-        </div>
+        </a>
     </div>
 
     <div class="calendar-card-info calendar-card">

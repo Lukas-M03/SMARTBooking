@@ -46,6 +46,7 @@
                     @elseif(Auth::user()->isAdviser())
                         <a href="{{ route('adviser.dashboard') }}" class="nav-link">Dashboard</a>
                         <a href="{{ route('bookings.index') }}" class="nav-link">Bookings</a>
+                        <a href="{{ route('bookings.index', ['status' => 'completed']) }}" class="nav-link">Completed Meetings</a>
                     @elseif(Auth::user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a>
                     @endif
