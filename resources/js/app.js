@@ -8,9 +8,17 @@ const calendarElements = document.querySelectorAll('.js-booking-calendar');
 calendarElements.forEach((element) => {
 	const eventsUrl = element.getAttribute('data-events-url');
 
+	// Responsive view: week on mobile, month on desktop
+	const getInitialView = () => {
+		if (window.innerWidth <= 700) {
+			return 'dayGridWeek';
+		}
+		return 'dayGridMonth';
+	};
+
 	const calendar = new Calendar(element, {
 		plugins: [dayGridPlugin],
-		initialView: 'dayGridMonth',
+		initialView: getInitialView(),
 		height: 'auto',
 		firstDay: 1,
 		events: {
@@ -27,6 +35,12 @@ calendarElements.forEach((element) => {
 			minute: '2-digit',
 			hour12: false,
 		},
+		windowResize: function(view) {
+			const newView = getInitialView();
+			if (calendar.view.type !== newView) {
+				calendar.changeView(newView);
+			}
+		}
 	});
 
 	calendar.render();

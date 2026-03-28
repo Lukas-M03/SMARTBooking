@@ -8,7 +8,8 @@
         </div>
 
         @if ($bookings->count() > 0)
-            <table style="width: 100%; border-collapse: collapse;">
+            <div class="table-responsive">
+                <table class="w-full border-collapse min-w-[700px]">
                 <thead>
                     <tr class="tr">
                         @if (Auth::user()->isStudent())
@@ -17,9 +18,9 @@
                             <th class="th">Student</th>
                         @endif
                         <th class="th">Topic</th>
-                        <th class="th">Expertise</th>
+                        <th class="th hide-mobile">Expertise</th>
                         <th class="th">Date & Time</th>
-                        <th class="th">Type</th>
+                        <th class="th hide-mobile">Type</th>
                         <th class="th">Status</th>
                         <th class="th">Actions</th>
                     </tr>
@@ -33,9 +34,9 @@
                                 <td class="td">{{ $booking->student->name }}</td>
                             @endif
                             <td class="td">{{ $booking->topic }}</td>
-                            <td class="td">{{ $booking->expertise->name }}</td>
+                            <td class="td hide-mobile">{{ $booking->expertise->name }}</td>
                             <td class="td">{{ $booking->preferred_datetime->format('M d, Y - H:i') }}</td>
-                            <td class="td">{{ ucfirst($booking->meeting_type) }}</td>
+                            <td class="td hide-mobile">{{ ucfirst($booking->meeting_type) }}</td>
                             <td class="td">
                                 <span class="span-status"
                                     style="background: {{
@@ -61,6 +62,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <p style="text-align: center; color: #999; padding: 28px;">
                 No bookings found.
