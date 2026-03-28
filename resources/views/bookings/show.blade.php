@@ -111,31 +111,29 @@
 
             @if (Auth::user()->isAdviser() && $booking->status === 'confirmed')
                 <button onclick="showCompleteForm()" class="btn btn-success">Completed</button>
+                <div id="completeForm" class="hidden mt-8 p-6 bg-gray-50 rounded">
+                    <h3 class="mb-4 mt-4 font-semibold text-lg">Complete Meeting</h3>
+                    <form method="POST" action="{{ route('bookings.complete', $booking) }}">
+                        @csrf
+                        <div class="form-group mt-4">
+                            <label for="adviser_notes_complete">Comments (Optional)</label>
+                            <textarea id="adviser_notes_complete" name="adviser_notes" rows="3" placeholder="Add comments about this meeting..."></textarea>
+                        </div>
+                        <div class="flex gap-4">
+                            <button type="submit" class="btn btn-success">Confirm Completion</button>
+                            <button type="button" onclick="hideCompleteForm()" class="btn btn-warning">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <script>
+                    function showCompleteForm() {
+                        document.getElementById('completeForm').style.display = 'block';
+                    }
+                    function hideCompleteForm() {
+                        document.getElementById('completeForm').style.display = 'none';
+                    }
+                </script>
             @endif
-
-            <div id="completeForm" class="hidden mt-8 p-6 bg-gray-50 rounded">
-                <h3 class="mb-4 mt-4 font-semibold text-lg">Complete Meeting</h3>
-                <form method="POST" action="{{ route('bookings.complete', $booking) }}">
-                    @csrf
-                    <div class="form-group mt-4">
-                        <label for="adviser_notes_complete">Comments (Optional)</label>
-                        <textarea id="adviser_notes_complete" name="adviser_notes" rows="3" placeholder="Add comments about this meeting..."></textarea>
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="submit" class="btn btn-success">Confirm Completion</button>
-                        <button type="button" onclick="hideCompleteForm()" class="btn btn-warning">Cancel</button>
-                    </div>
-                </form>
-            </div>
-
-            <script>
-                function showCompleteForm() {
-                    document.getElementById('completeForm').style.display = 'block';
-                }
-                function hideCompleteForm() {
-                    document.getElementById('completeForm').style.display = 'none';
-                }
-            </script>
             @endif
         </div>
 
