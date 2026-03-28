@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bookings/{booking}/deny', [BookingController::class, 'deny'])->name('bookings.deny');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('bookings.complete');
+    Route::put('/bookings/{booking}/update-comment', [BookingController::class, 'updateComment'])->name('bookings.updateComment');
     Route::delete('/bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
 });
 

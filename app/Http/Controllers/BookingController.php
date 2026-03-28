@@ -11,6 +11,24 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
+
+    /**
+     * Update adviser comment for a completed booking (adviser only).
+     */
+    public function updateComment(Request $request, Booking $booking)
+    {
+        $user = Auth::user();
+        if ($booking->adviser_id !== $user->id || $booking->status !== 'completed') {
+            abort(403);
+        }
+        $validated = $request->validate([
+            'adviser_notes' => ['nullable', 'string'],
+        ]);
+        $booking->update([
+            'adviser_notes' => $validated['adviser_notes'],
+        ]);
+        return back()->with('success', 'Comment updated successfully.');
+    }
 {
     /**
      * Retrieve all bookings for the authenticated user.
