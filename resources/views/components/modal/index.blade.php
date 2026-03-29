@@ -18,7 +18,7 @@
     
         <!-- Close button -->
         <button type="button" 
-                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" 
+                class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" 
                 aria-label="Close modal" 
                 x-on:click="$dispatch('close-modal', '{{ $name }}')">
             <x-svg icon="x-mark" /> 
@@ -26,7 +26,7 @@
 
         <!-- Modal header -->        
         @isset($header)
-            <div class="text-lg font-semibold mb-4 border-b border-gray-200 pb-3">
+            <div class="text-lg font-semibold mb-4 border-b border-gray-200 pb-3 ">
                 {{ $header }}
             </div>
         @endisset

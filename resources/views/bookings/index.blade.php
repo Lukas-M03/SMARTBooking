@@ -9,7 +9,7 @@
 
         @if ($bookings->count() > 0)
             <div class="table-responsive" style="overflow-x: auto;">
-                <table class="w-full border-collapse min-w-[700px]">
+                <table class="w-full border-collapse min-w-175">
                 <thead>
                     <tr class="tr">
                         @if (Auth::user()->isStudent())

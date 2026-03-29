@@ -5,7 +5,7 @@
     </div>
     @if ($upcomingBookings->count() > 0)
         <div class="table-responsive">
-            <table class="w-full border-collapse min-w-[700px]">
+            <table class="w-full border-collapse min-w-175">
                 <thead>
                     <tr class="border-b-2 border-gray-300">
                         <th class="py-4 px-4 text-left">Topic</th>

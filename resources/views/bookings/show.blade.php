@@ -91,17 +91,19 @@
 
                     <x-modal.index name="cancel-booking">
                         <x-slot:header>
+                            <div class="ml-2">
                             Confirm Cancellation
+                            </div>
                         </x-slot:header>
 
                         <p>Are you sure you want to cancel this booking?</p>
 
                         <x-slot:footer>
                             <div class="flex gap-3 justify-end">
-                                <x-modal.close target="cancel-booking" class="btn ">Keep Booking</x-modal.close>
+                                <x-modal.close target="cancel-booking" class="btn hover:bg-green-500 hover:text-white">Keep Booking</x-modal.close>
                                 <form method="POST" action="{{ route('bookings.cancel', $booking) }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-warning">Yes, Cancel</button>
+                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Cancel</button>
                                 </form>
                             </div>
                         </x-slot:footer>
