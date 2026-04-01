@@ -29,11 +29,28 @@
                         </form>
                     @endif
                     @if ($notification->is_read)
-                        <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}" onsubmit="return confirm('Are you sure you want to delete this notification?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="ml-4 text-red-500 hover:text-red-400 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete</button>
-                        </form>
+                        <x-modal.open target="delete-notification-{{ $notification->id }}" class="ml-4 text-red-500 hover:text-red-400 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete</x-modal.open>
+
+                        <x-modal.index name="delete-notification-{{ $notification->id }}">
+                            <x-slot:header>
+                                <div class="ml-2">
+                                Confirm Deletion
+                                </div>
+                            </x-slot:header>
+
+                            <p>Are you sure you want to delete this notification?</p>
+
+                            <x-slot:footer>
+                                <div class="flex gap-3 justify-end">
+                                    <x-modal.close target="delete-notification-{{ $notification->id }}" class="btn hover:bg-green-500 hover:text-white">Keep Notification</x-modal.close>
+                                    <form method="POST" action="{{ route('notifications.destroy', $notification->id) }}" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Delete</button>
+                                    </form>
+                                </div>
+                            </x-slot:footer>
+                        </x-modal.index>
                     @endif
                 </div>
             @endforeach
@@ -42,11 +59,28 @@
                 {{ $notifications->links() }}
             </div>
             <div class="mt-7 flex justify-end">
-                <form method="POST" action="{{ route('notifications.delete-all') }}" onsubmit="return confirm('Are you sure you want to delete all notifications?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="hover:text-red-400 text-red-600 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete All Notifications</button>
-                </form>
+                <x-modal.open target="delete-all-notifications" class="hover:text-red-400 text-red-600 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete All Notifications</x-modal.open>
+
+                <x-modal.index name="delete-all-notifications">
+                    <x-slot:header>
+                        <div class="ml-2">
+                        Confirm Deletion
+                        </div>
+                    </x-slot:header>
+
+                    <p>Are you sure you want to delete all notifications?</p>
+
+                    <x-slot:footer>
+                        <div class="flex gap-3 justify-end">
+                            <x-modal.close target="delete-all-notifications" class="btn hover:bg-green-500 hover:text-white">Keep Notifications</x-modal.close>
+                            <form method="POST" action="{{ route('notifications.delete-all') }}" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Delete All</button>
+                            </form>
+                        </div>
+                    </x-slot:footer>
+                </x-modal.index>
             </div>
         @else
             <p class="text-center text-gray-400 p-7">No notifications yet.</p>

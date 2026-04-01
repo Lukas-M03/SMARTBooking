@@ -269,19 +269,19 @@ class BookingController extends Controller
         }
 
         $validated = $request->validate([
-            'adviser_notes' => ['nullable', 'string'],
+            'denial_reason' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $booking->update([
             'status' => 'denied',
-            'adviser_notes' => $validated['adviser_notes'] ?? 'Booking request denied.',
+            'denial_reason' => $validated['denial_reason'] ?? 'Booking request denied.',
         ]);
 
         Notification::create([
             'user_id' => $booking->student_id,
             'booking_id' => $booking->id,
             'title' => 'Booking Denied',
-            'message' => "Your booking for '" . $booking->topic . "' has been denied. Reason: " . ($validated['adviser_notes'] ?? 'Not specified.'),
+            'message' => "Your booking for '" . $booking->topic . "' has been denied. Reason: " . ($validated['denial_reason'] ?? 'Not specified.'),
             'type' => 'warning',
         ]);
 
@@ -325,7 +325,7 @@ class BookingController extends Controller
             abort(403);
         }
         $booking->delete();
-        return back()->with('success', 'Booking deleted successfully.');
+        return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully.');
     }
 
     /**
@@ -347,5 +347,27 @@ class BookingController extends Controller
             'type' => 'success',
         ]);
         return back()->with('success', 'Booking marked as completed.');
+    }
+
+    /**
+     * Update adviser notes for a completed booking (assigned adviser only).
+     */
+    public function updateComment(Request $request, Booking $booking)
+    {
+        $user = Auth::user();
+
+        if (!$user->isAdviser() || $booking->adviser_id !== $user->id || $booking->status !== 'completed') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'completion_notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $booking->update([
+            'completion_notes' => $validated['completion_notes'] ?? null,
+        ]);
+
+        return back()->with('success', 'Completion notes updated successfully.');
     }
 }

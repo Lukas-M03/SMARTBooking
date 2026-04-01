@@ -2,11 +2,11 @@
     'name',
     'value' => null,
     'options' => [],
-    'placeholder' => 'Choose option...'
+    'placeholder' => null
 ])
 
 <select {{ $attributes->merge(['id' => $name, 'name' => $name])->class('bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5') }}>
-    @if($placeholder && empty($options)) 
+    @if(!is_null($placeholder))
         <option value="" @selected(empty($value))>{{ $placeholder }}</option>
     @endif
     @if(!empty($options))

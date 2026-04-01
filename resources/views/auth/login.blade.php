@@ -7,16 +7,13 @@
                 @csrf
 
                 <div class="login-field">
-                    <x-form.label for="email" class="login-visually-hidden">Email</x-form.label>
-                    <x-form.input type="email" name="email" value="{{ old('email') }}" placeholder="Email" autocomplete="email" required autofocus/>
-                    <x-form.error name="email" />
+                    <x-form.group mode="input" name="email" label="Email" labelClass="login-visually-hidden"
+                        :value="old('email')" type="email" placeholder="Email" autocomplete="email" required autofocus />
                 </div>
 
                 <div class="login-field login-field-password">
-                    <x-form.label for="password" class="login-visually-hidden">Password</x-form.label>
-                    <x-form.input type="password" name="password" placeholder="Password" autocomplete="current-password" required/>
-
-                    <x-form.error name="password" />
+                    <x-form.group mode="input" name="password" label="Password" labelClass="login-visually-hidden"
+                        type="password" placeholder="Password" autocomplete="current-password" required />
                 </div>
 
                 <div class="login-options-row">
@@ -29,9 +26,9 @@
                 </div>
 
                 <button type="submit" class="login-submit-btn">Sign in</button>
-                        <p class="text-center mt-6">
-                            Not registered? <a href="{{ route('register') }}" class="forgot-link">Create an account</a>
-                        </p>
+                <p class="text-center mt-6">
+                    Not registered? <a href="{{ route('register') }}" class="forgot-link">Create an account</a>
+                </p>
             </form>
         </section>
     </div>

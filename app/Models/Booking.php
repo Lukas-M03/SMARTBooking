@@ -19,7 +19,8 @@ class Booking extends Model
         'preferred_datetime',
         'meeting_type',
         'status',
-        'adviser_notes',
+        'denial_reason',
+        'completion_notes',
         'confirmed_at',
         'scheduled_deletion_at',
     ];

@@ -57,6 +57,18 @@
     margin-bottom: 14px;
 }
 
+.completion-notes-divider {
+    margin-bottom: 4px !important;
+}
+
+.completion-notes-actions {
+    padding-top: 6px;
+}
+
+.completion-notes-edit-wrap {
+    margin-top: 3px;
+}
+
 tr {
     border-bottom: 2px solid #ccc;
 }
@@ -535,6 +547,66 @@ td {
     border-radius: 5px;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.bookings-page-create {
+    max-width: 800px;
+    margin: 32px auto;
+}
+
+.bookings-page-index {
+    max-width: 1000px;
+    margin: 30px auto;
+}
+
+.bookings-table-wrap {
+    overflow-x: auto;
+}
+
+.booking-form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.booking-form-actions .btn {
+    min-height: 42px;
+}
+
+@media (max-width: 700px) {
+    .bookings-page {
+        padding: 14px;
+    }
+
+    .div-show-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .div-info {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .div-mybookings {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .div-mybookings .btn {
+        width: 100%;
+    }
+
+    .booking-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .booking-form-actions .btn {
+        width: 100%;
+    }
 }
 
 /* =========================

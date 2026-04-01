@@ -9,7 +9,7 @@
     };
 
     // Base alert box styling
-    $baseClasses = 'flex items-start gap-3 px-6 py-5 rounded-lg border text-sm font-medium shadow-lg transition-all duration-300 max-w-md fixed right-5 top-15';
+    $baseClasses = 'flex items-start gap-3 px-6 py-5 rounded-lg border text-sm font-medium shadow-lg transition-all duration-300 max-w-md fixed right-5 top-15 z-[9999]';
 @endphp
 
 @if ($type)

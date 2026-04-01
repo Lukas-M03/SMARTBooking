@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="card relative pr-14">
+    <div class="card relative bookings-page bookings-page-show pr-4 md:pr-14">
         <div class="table-responsive">
         <a href="{{ route('bookings.index') }}"
             class="absolute top-4 right-4 inline-flex items-center justify-center rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
@@ -59,11 +59,44 @@
             @endif
         </div>
 
-        @if ($booking->adviser_notes)
+        @if ($booking->status === 'denied' && $booking->denial_reason)
             <hr class="border-t border-gray-300 my-4">
             <div>
-                <h3 class="h3-info">Adviser Notes</h3>
-                <p class="bg-yellow-50 p-4 rounded">{{ $booking->adviser_notes }}</p>
+                <h3 class="h3-info">Denial Reason</h3>
+                <p class="bg-yellow-50 p-4 rounded">{{ $booking->denial_reason }}</p>
+            </div>
+        @endif
+
+        @if ($booking->status === 'completed' && $booking->completion_notes)
+            <hr class="border-t border-gray-300 my-4">
+            <div id="completionNotesDisplay">
+                <h3 class="h3-info">Completion Notes</h3>
+                <p class="bg-yellow-50 p-4 rounded">{{ $booking->completion_notes }}</p>
+            </div>
+        @endif
+
+        @if (Auth::user()->isAdviser() && $booking->adviser_id === Auth::id() && $booking->status === 'completed')
+            <hr class="border-t border-gray-300 my-4 completion-notes-divider">
+            <div class="space-y-3 completion-notes-actions">
+                <div class="completion-notes-edit-wrap">
+                    <button type="button" onclick="toggleAdviserNotesEdit()" id="toggleNotesEditBtn" class="btn btn-warning inline-block">
+                        Edit Notes
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('bookings.updateComment', $booking) }}" id="adviserNotesEditForm" class="space-y-3 hidden">
+                    @csrf
+                    @method('PUT')
+                    <h3 class="h3-info">Edit Adviser Notes</h3>
+                    <x-form.group mode="textarea" name="completion_notes"
+                        :value="old('completion_notes', $booking->completion_notes)" rows="4"
+                        placeholder="Add or update notes for this completed booking..." />
+
+                    <div class="flex gap-3">
+                        <button type="submit" class="btn btn-success">Save Notes</button>
+                        <button type="button" onclick="toggleAdviserNotesEdit()" class="btn btn-warning">Cancel Edit</button>
+                    </div>
+                </form>
             </div>
         @endif
 
@@ -81,11 +114,28 @@
 
             @if ($booking->adviser_id === Auth::id() || (($booking->status === 'pending' || $booking->status === 'confirmed') && $booking->student_id === Auth::id()))
                 @if ($booking->status === 'cancelled' || $booking->status === 'denied' && Auth::user()->isAdviser())
-                    <form method="POST" action="{{ route('bookings.destroy', $booking) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this cancelled booking?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete Booking</button>
-                    </form>
+                    <x-modal.open target="delete-booking" class="btn btn-danger">Delete Booking</x-modal.open>
+
+                    <x-modal.index name="delete-booking">
+                        <x-slot:header>
+                            <div class="ml-2">
+                            Confirm Deletion
+                            </div>
+                        </x-slot:header>
+
+                        <p>Are you sure you want to permanently delete this booking?</p>
+
+                        <x-slot:footer>
+                            <div class="flex gap-3 justify-end">
+                                <x-modal.close target="delete-booking" class="btn hover:bg-green-500 hover:text-white">Keep Booking</x-modal.close>
+                                <form method="POST" action="{{ route('bookings.destroy', $booking) }}" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Delete</button>
+                                </form>
+                            </div>
+                        </x-slot:footer>
+                    </x-modal.index>
                 @elseif ($booking->status !== 'completed')
                     <x-modal.open target="cancel-booking" class="btn btn-warning">Cancel Booking</x-modal.open>
 
@@ -125,9 +175,9 @@
                 <form method="POST" action="{{ route('bookings.deny', $booking) }}">
                     @csrf
                     <div class="form-group mt-4">
-                        <label for="adviser_notes">Reason for Denial (Optional)</label>
-                        <textarea id="adviser_notes" name="adviser_notes" rows="3"
-                            placeholder="Provide a reason for denying this booking..."></textarea>
+                        <x-form.group mode="textarea" name="denial_reason" label="Reason for Denial (Optional)"
+                            :value="old('denial_reason')" rows="3"
+                            placeholder="Provide a reason for denying this booking..." />
                     </div>
                     <div class="flex gap-4">
                         <button type="submit" class="btn btn-danger">Confirm Denial</button>
@@ -143,6 +193,31 @@
 
                 function hideDenyForm() {
                     document.getElementById('denyForm').style.display = 'none';
+                }
+            </script>
+        @endif
+
+        @if (Auth::user()->isAdviser() && $booking->adviser_id === Auth::id() && $booking->status === 'completed')
+            <script>
+                function toggleAdviserNotesEdit() {
+                    const editForm = document.getElementById('adviserNotesEditForm');
+                    const displayBlock = document.getElementById('completionNotesDisplay');
+                    const toggleButton = document.getElementById('toggleNotesEditBtn');
+                    const isHidden = editForm.classList.contains('hidden');
+
+                    if (isHidden) {
+                        editForm.classList.remove('hidden');
+                        if (displayBlock) {
+                            displayBlock.classList.add('hidden');
+                        }
+                        toggleButton.textContent = 'Hide Editor';
+                    } else {
+                        editForm.classList.add('hidden');
+                        if (displayBlock) {
+                            displayBlock.classList.remove('hidden');
+                        }
+                        toggleButton.textContent = 'Edit Notes';
+                    }
                 }
             </script>
         @endif
