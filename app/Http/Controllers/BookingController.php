@@ -125,7 +125,13 @@ class BookingController extends Controller
                 $eventData = MicrosoftGraphService::formatBookingAsEvent($booking, $participant);
                 $eventId = $graph->createBookingEvent($eventData);
 
-                if (!$eventId) {
+                if ($eventId) {
+                    if ((int) $participant->id === (int) $booking->student_id) {
+                        $booking->student_outlook_event_id = $eventId;
+                    } elseif ((int) $participant->id === (int) $booking->adviser_id) {
+                        $booking->adviser_outlook_event_id = $eventId;
+                    }
+                } else {
                     Log::warning('Booking created but Outlook event was not created.', [
                         'booking_id' => $booking->id,
                         'user_id' => $participant->id,
@@ -138,6 +144,76 @@ class BookingController extends Controller
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+
+        if ($booking->isDirty(['student_outlook_event_id', 'adviser_outlook_event_id'])) {
+            $booking->save();
+        }
+    }
+
+    /**
+     * Sync booking status changes to connected Outlook calendars.
+     * - confirmed/completed: create or update events
+     * - denied/cancelled: delete events and clear stored IDs
+     */
+    private function syncBookingStatusToOutlook(Booking $booking): void
+    {
+        $booking->loadMissing(['student', 'adviser', 'expertise']);
+
+        $participants = collect([$booking->student, $booking->adviser])
+            ->filter(fn ($user) => $user && $user->hasMicrosoftToken())
+            ->unique('id')
+            ->values();
+
+        $isCancelledOrDenied = in_array($booking->status, ['denied', 'cancelled', 'canceled'], true);
+
+        foreach ($participants as $participant) {
+            $eventColumn = ((int) $participant->id === (int) $booking->student_id)
+                ? 'student_outlook_event_id'
+                : 'adviser_outlook_event_id';
+
+            $eventId = $booking->{$eventColumn};
+
+            try {
+                $graph = new MicrosoftGraphService($participant);
+
+                if ($isCancelledOrDenied) {
+                    if ($eventId) {
+                        $graph->deleteBookingEvent($eventId);
+                        $booking->{$eventColumn} = null;
+                    }
+                    continue;
+                }
+
+                $eventData = MicrosoftGraphService::formatBookingAsEvent($booking, $participant);
+
+                if ($eventId) {
+                    $updated = $graph->updateBookingEvent($eventId, $eventData);
+
+                    if (!$updated) {
+                        $replacementId = $graph->createBookingEvent($eventData);
+                        if ($replacementId) {
+                            $booking->{$eventColumn} = $replacementId;
+                        }
+                    }
+                } else {
+                    $createdEventId = $graph->createBookingEvent($eventData);
+                    if ($createdEventId) {
+                        $booking->{$eventColumn} = $createdEventId;
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::warning('Booking status updated but Outlook sync failed.', [
+                    'booking_id' => $booking->id,
+                    'user_id' => $participant->id,
+                    'status' => $booking->status,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if ($booking->isDirty(['student_outlook_event_id', 'adviser_outlook_event_id'])) {
+            $booking->save();
         }
     }
 
@@ -244,6 +320,8 @@ class BookingController extends Controller
             'scheduled_deletion_at' => now()->addDays(90),
         ]);
 
+        $this->syncBookingStatusToOutlook($booking);
+
         Notification::create([
             'user_id' => $booking->student_id,
             'booking_id' => $booking->id,
@@ -277,6 +355,8 @@ class BookingController extends Controller
             'denial_reason' => $validated['denial_reason'] ?? 'Booking request denied.',
         ]);
 
+        $this->syncBookingStatusToOutlook($booking);
+
         Notification::create([
             'user_id' => $booking->student_id,
             'booking_id' => $booking->id,
@@ -301,6 +381,8 @@ class BookingController extends Controller
         }
 
         $booking->update(['status' => 'cancelled']);
+
+        $this->syncBookingStatusToOutlook($booking);
 
         $otherUserId = ($booking->student_id === $user->id) ? $booking->adviser_id : $booking->student_id;
 
@@ -338,6 +420,8 @@ class BookingController extends Controller
             abort(403);
         }
         $booking->update(['status' => 'completed']);
+
+        $this->syncBookingStatusToOutlook($booking);
         // Optionally, notify the student
         Notification::create([
             'user_id' => $booking->student_id,

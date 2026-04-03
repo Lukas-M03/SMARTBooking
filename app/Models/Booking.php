@@ -23,6 +23,8 @@ class Booking extends Model
         'completion_notes',
         'confirmed_at',
         'scheduled_deletion_at',
+        'student_outlook_event_id',
+        'adviser_outlook_event_id',
     ];
 
     protected $casts = [

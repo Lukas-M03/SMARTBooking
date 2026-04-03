@@ -28,23 +28,23 @@
 
     <div class="grid-cards">
         <a href="{{ route('bookings.index') }}" class="card card-colour">
-            <h3>Total Bookings</h3>
-            <p class="card-p">{{ $stats['total'] }}</p>
+            <h3 class="text-black font-bold">Total Bookings</h3>
+            <p class="card-p text-black">{{ $stats['total'] }}</p>
         </a>
         
         <a href="{{ route('bookings.index', ['status' => 'pending']) }}" class="card card-colour">
-            <h3>Pending Requests</h3>
-            <p class="card-p">{{ $stats['pending'] }}</p>
+            <h3 class="text-black font-bold">Pending Requests</h3>
+            <p class="card-p text-black">{{ $stats['pending'] }}</p>
         </a>
 
         <a href="{{ route('bookings.index', ['status' => 'confirmed']) }}" class="card card-colour">
-            <h3>Confirmed</h3>
-            <p class="card-p">{{ $stats['confirmed'] }}</p>
+            <h3 class="text-black font-bold">Confirmed</h3>
+            <p class="card-p text-black">{{ $stats['confirmed'] }}</p>
         </a>
 
         <a href="{{ route('bookings.index', ['status' => 'completed']) }}" class="card card-colour">
-            <h3>Completed</h3>
-            <p class="card-p">{{ $stats['completed'] }}</p>
+            <h3 class="text-black font-bold">Completed</h3>
+            <p class="card-p text-black">{{ $stats['completed'] }}</p>
         </a>
     </div>
 
