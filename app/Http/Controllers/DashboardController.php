@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -99,22 +100,40 @@ class DashboardController extends Controller
      */
     public function admin()
     {
-        $totalBookings = Booking::count();
-        $totalUsers = \App\Models\User::count();
-        $pendingBookings = Booking::where('status', 'pending')->count();
-        $confirmedBookings = Booking::where('status', 'confirmed')->count();
-
-        $recentBookings = Booking::with(['student', 'adviser', 'expertise'])
-            ->orderBy('created_at', 'desc')
-            ->take(10)
-            ->get();
+        $totalUsers = User::count();
+        $completedBookings = Booking::where('status', 'completed')->count();
 
         return view('dashboards.admin', [
-            'totalBookings' => $totalBookings,
             'totalUsers' => $totalUsers,
-            'pendingBookings' => $pendingBookings,
-            'confirmedBookings' => $confirmedBookings,
-            'recentBookings' => $recentBookings,
+            'completedBookings' => $completedBookings,
+        ]);
+    }
+
+    public function adminUsers()
+    {
+        $students = User::where('role', 'student')
+            ->orderBy('name')
+            ->get();
+
+        $advisers = User::where('role', 'adviser')
+            ->orderBy('name')
+            ->get();
+
+        return view('dashboards.admin-users', [
+            'students' => $students,
+            'advisers' => $advisers,
+        ]);
+    }
+
+    public function adminCompletedBookings()
+    {
+        $completedBookings = Booking::with(['student', 'adviser', 'expertise'])
+            ->where('status', 'completed')
+            ->orderByDesc('preferred_datetime')
+            ->get();
+
+        return view('dashboards.admin-completed-bookings', [
+            'completedBookings' => $completedBookings,
         ]);
     }
 }

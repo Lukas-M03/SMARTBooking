@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -22,14 +22,12 @@ class ForgotPasswordController extends Controller
             'email.email' => 'Enter a valid email address (example@domain.com).',
         ]);
 
-        $status = Password::sendResetLink($request->only('email'));
+        $email = $request->string('email')->toString();
+        $token = Str::random(40);
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('success', __($status));
-        }
-
-        return back()->withInput($request->only('email'))->withErrors([
-            'email' => __($status),
-        ]);
+        return redirect()->route('password.reset', [
+            'token' => $token,
+            'email' => $email,
+        ])->with('success', 'Email confirmed. You can now reset your password.');
     }
 }

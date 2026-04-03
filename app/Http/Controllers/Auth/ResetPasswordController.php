@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
@@ -23,7 +22,6 @@ class ResetPasswordController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
@@ -34,24 +32,21 @@ class ResetPasswordController extends Controller
             'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $user = User::where('email', $request->string('email')->toString())->first();
 
-                event(new PasswordReset($user));
-            }
-        );
-
-        if ($status === Password::PASSWORD_RESET) {
-            return redirect()->route('login')->with('success', __($status));
+        if (! $user) {
+            return back()->withInput($request->only('email'))->withErrors([
+                'email' => 'No account found for this email address.',
+            ]);
         }
 
-        return back()->withInput($request->only('email'))->withErrors([
-            'email' => __($status),
-        ]);
+        $user->forceFill([
+            'password' => Hash::make($request->string('password')->toString()),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        event(new PasswordReset($user));
+
+        return redirect()->route('login')->with('success', 'Your password has been reset successfully.');
     }
 }

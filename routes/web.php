@@ -53,6 +53,8 @@ Route::middleware(['auth'])->prefix('adviser')->group(function () {
 // Admin Routes
 Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/users', [DashboardController::class, 'adminUsers'])->name('admin.users');
+    Route::get('/bookings/completed', [DashboardController::class, 'adminCompletedBookings'])->name('admin.bookings.completed');
 });
 
 // Booking Routes
