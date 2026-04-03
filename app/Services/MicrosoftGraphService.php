@@ -187,9 +187,9 @@ class MicrosoftGraphService
      */
     public static function formatBookingAsEvent($booking, User $calendarOwner): array
     {
-        // App stores a single preferred_datetime, so calendar events default to 1 hour.
+        // App stores a single preferred_datetime, so calendar events default to 30 minutes.
         $start = $booking->preferred_datetime->copy();
-        $end = $booking->preferred_datetime->copy()->addHour();
+        $end = $booking->preferred_datetime->copy()->addMinutes(30);
 
         $studentName = $booking->student?->name ?? 'Student';
         $adviserName = $booking->adviser?->name ?? 'Adviser';

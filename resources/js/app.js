@@ -156,10 +156,119 @@ function initRegisterForm() {
 	filterAdvisers();
 }
 
+function initBookingSlotPicker() {
+	const slotPicker = document.getElementById('bookingSlotPicker');
+
+	if (!slotPicker) {
+		return;
+	}
+
+	const slotsUrl = slotPicker.dataset.slotsUrl;
+	const oldDateTime = slotPicker.dataset.oldDatetime || '';
+	const dateInput = document.getElementById('booking_slot_date');
+	const preferredDateTimeInput = document.getElementById('preferred_datetime');
+	const slotGrid = document.getElementById('bookingSlotGrid');
+	const slotHint = document.getElementById('bookingSlotHint');
+
+	if (!slotsUrl || !dateInput || !preferredDateTimeInput || !slotGrid || !slotHint) {
+		return;
+	}
+
+	const today = new Date();
+	const minDate = today.toISOString().slice(0, 10);
+	dateInput.min = minDate;
+
+	const oldDate = oldDateTime ? oldDateTime.slice(0, 10) : '';
+	const initialDate = oldDate || minDate;
+	dateInput.value = initialDate;
+
+	const setSelectedSlot = (isoDateTime) => {
+		preferredDateTimeInput.value = isoDateTime;
+
+		slotGrid.querySelectorAll('.booking-slot-btn').forEach((button) => {
+			button.classList.toggle('is-selected', button.dataset.start === isoDateTime);
+		});
+	};
+
+	const renderSlots = (slots, adviserName) => {
+		slotGrid.innerHTML = '';
+
+		if (!Array.isArray(slots) || slots.length === 0) {
+			slotHint.textContent = adviserName
+				? `No slots available for ${adviserName} on this date.`
+				: 'No slots available on this date.';
+			return;
+		}
+
+		slotHint.textContent = adviserName
+			? `Showing slots for ${adviserName}. Unavailable times are disabled.`
+			: 'Select an available 30-minute slot.';
+
+		slots.forEach((slot) => {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'booking-slot-btn';
+			button.dataset.start = slot.start;
+			button.textContent = slot.label;
+
+			if (slot.available) {
+				button.addEventListener('click', () => setSelectedSlot(slot.start));
+			} else {
+				button.classList.add('is-unavailable');
+				button.disabled = true;
+				button.title = slot.reason || 'Unavailable';
+			}
+
+			slotGrid.appendChild(button);
+		});
+
+		if (preferredDateTimeInput.value) {
+			setSelectedSlot(preferredDateTimeInput.value);
+		}
+	};
+
+	const loadSlots = async (dateValue) => {
+		slotGrid.innerHTML = '<p class="booking-slot-loading">Loading slots...</p>';
+
+		try {
+			const url = new URL(slotsUrl, window.location.origin);
+			url.searchParams.set('date', dateValue);
+
+			const response = await fetch(url.toString(), {
+				headers: { 'Accept': 'application/json' },
+				credentials: 'same-origin',
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to load slots.');
+			}
+
+			const payload = await response.json();
+			const adviserName = payload?.adviser?.name || null;
+
+			if (preferredDateTimeInput.value.slice(0, 10) !== dateValue) {
+				preferredDateTimeInput.value = '';
+			}
+
+			renderSlots(payload.slots || [], adviserName);
+		} catch (error) {
+			slotGrid.innerHTML = '<p class="booking-slot-loading">Could not load slots. Please try another date.</p>';
+			slotHint.textContent = 'Unable to load slot availability right now.';
+		}
+	};
+
+	dateInput.addEventListener('change', () => {
+		loadSlots(dateInput.value);
+	});
+
+	loadSlots(initialDate);
+}
+
 // ── Mobile navigation toggle ─────────────────────────────────────────────────
 // Wait until the DOM is ready before attaching event listeners.
 document.addEventListener('DOMContentLoaded', function () {
 	initRegisterForm();
+	initBookingSlotPicker();
 
 	// All mobile menu toggle buttons (guest + authenticated nav).
 	const toggles = document.querySelectorAll('.js-nav-toggle');

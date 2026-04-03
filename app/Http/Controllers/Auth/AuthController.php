@@ -63,7 +63,10 @@ class AuthController extends Controller
                 'expertise'  => $a->expertise->pluck('id')->all(),
             ]);
 
-        return view('auth.register', compact('expertiseList', 'advisers'));
+        return view('auth.register', [
+            'expertiseList' => $expertiseList,
+            'advisers' => $advisers,
+        ]);
     }
 
     public function register(Request $request)

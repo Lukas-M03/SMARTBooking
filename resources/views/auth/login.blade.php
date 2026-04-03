@@ -22,7 +22,7 @@
                         <x-form.label for="remember" class="remember-text">Remember me</x-form.label>
                     </label>
 
-                    <a href="#" class="forgot-link">Forgot Password?</a>
+                    <a href="{{ route('password.request') }}" class="forgot-link">Forgot Password?</a>
                 </div>
 
                 <button type="submit" class="login-submit-btn">Sign in</button>

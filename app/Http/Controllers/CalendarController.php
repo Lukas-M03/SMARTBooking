@@ -118,7 +118,7 @@ class CalendarController extends Controller
     private function formatBookingEvent(Booking $booking, bool $forStudent, bool $isBackground = false): array
     {
         $start = $booking->preferred_datetime->copy();
-        $end = $booking->preferred_datetime->copy()->addHour();
+        $end = $booking->preferred_datetime->copy()->addMinutes(30);
         $status = $booking->status;
 
         $studentName = $booking->student?->name ?? 'Student';

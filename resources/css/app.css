@@ -601,6 +601,61 @@ td {
     min-height: 42px;
 }
 
+.booking-slot-picker {
+    margin-top: 8px;
+}
+
+.booking-slot-hint {
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.booking-slot-date-input {
+    max-width: 260px;
+}
+
+.booking-slot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.booking-slot-btn {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #1f2937;
+    padding: 10px 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.booking-slot-btn:hover {
+    border-color: #94a3b8;
+    background: #eef2ff;
+}
+
+.booking-slot-btn.is-selected {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.booking-slot-btn.is-unavailable {
+    border-color: #e5e7eb;
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.booking-slot-loading {
+    color: #6b7280;
+    font-size: 14px;
+}
+
 @media (max-width: 700px) {
     .bookings-page {
         padding: 14px;

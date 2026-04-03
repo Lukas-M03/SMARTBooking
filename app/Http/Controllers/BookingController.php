@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\User;
 use App\Models\Notification;
 use App\Services\MicrosoftGraphService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +38,7 @@ class BookingController extends Controller
 
         $bookings = $query->orderBy('preferred_datetime', 'asc')->get();
 
-        return view('bookings.index', compact('bookings'));
+        return view('bookings.index', ['bookings' => $bookings]);
     }
 
     /**
@@ -49,6 +50,44 @@ class BookingController extends Controller
     }
 
     /**
+     * Return available/unavailable 30-minute slots for a specific date.
+     */
+    public function availableSlots(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => ['required', 'date'],
+        ]);
+
+        $student = Auth::user();
+
+        if (!$student || !$student->isStudent()) {
+            abort(403);
+        }
+
+        $assignment = $this->resolveBookingAssignment($student);
+
+        if (!$assignment) {
+            return response()->json([
+                'adviser' => null,
+                'slots' => [],
+                'message' => 'No adviser is currently available for your module mapping.',
+            ], 422);
+        }
+
+        $adviser = $assignment['adviser'];
+        $day = Carbon::parse($validated['date'])->startOfDay();
+
+        return response()->json([
+            'adviser' => [
+                'id' => $adviser->id,
+                'name' => $adviser->name,
+            ],
+            'date' => $day->toDateString(),
+            'slots' => $this->buildDailySlots($adviser, $day),
+        ]);
+    }
+
+    /**
      * Store a newly created booking in the database.
      * Validates input, resolves adviser/expertise from registration profile,
      * creates the booking with pending status, and notifies both student and adviser.
@@ -56,10 +95,12 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'topic' => ['required', 'string', 'max:255'],
+            'topic' => ['required', 'string', 'max:40'],
             'description' => ['nullable', 'string'],
             'preferred_datetime' => ['required', 'date', 'after:now'],
             'meeting_type' => ['required', 'in:in-person,online,phone'],
+        ], [
+            'topic.required' => 'Please enter a meeting topic.',
         ]);
 
         $assignment = $this->resolveBookingAssignment(Auth::user());
@@ -72,6 +113,13 @@ class BookingController extends Controller
 
         $adviser = $assignment['adviser'];
         $expertiseId = $assignment['expertise_id'];
+        $preferredDateTime = Carbon::parse($validated['preferred_datetime']);
+
+        if ($this->isAdviserSlotUnavailable($adviser->id, $preferredDateTime)) {
+            return back()
+                ->withInput()
+                ->withErrors(['preferred_datetime' => 'This adviser is already booked around that time. Please choose a different slot.']);
+        }
 
         $booking = Booking::create([
             'student_id' => Auth::id(),
@@ -79,7 +127,7 @@ class BookingController extends Controller
             'expertise_id' => $expertiseId,
             'topic' => $validated['topic'],
             'description' => $validated['description'],
-            'preferred_datetime' => $validated['preferred_datetime'],
+            'preferred_datetime' => $preferredDateTime,
             'meeting_type' => $validated['meeting_type'],
             'status' => 'pending',
         ]);
@@ -152,6 +200,104 @@ class BookingController extends Controller
     }
 
     /**
+     * Determine whether an adviser already has a pending/confirmed booking
+     * that overlaps the requested 30-minute slot.
+     */
+    private function isAdviserSlotUnavailable(int $adviserId, Carbon $requestedStart): bool
+    {
+        $windowStart = $requestedStart->copy()->subMinutes(30)->addSecond();
+        $windowEnd = $requestedStart->copy()->addMinutes(30)->subSecond();
+
+        return Booking::where('adviser_id', $adviserId)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereBetween('preferred_datetime', [$windowStart, $windowEnd])
+            ->exists();
+    }
+
+    /**
+     * Build a day view of 30-minute slots and mark busy windows.
+     */
+    private function buildDailySlots(User $adviser, Carbon $day): array
+    {
+        $dayStart = $day->copy()->startOfDay();
+        $dayEnd = $day->copy()->endOfDay();
+
+        $busyWindows = $this->getBusyWindowsForAdviser($adviser, $dayStart, $dayEnd);
+        $slots = [];
+
+        for ($hour = 9; $hour <= 16; $hour++) {
+            foreach ([0, 30] as $minute) {
+                $slotStart = $day->copy()->setTime($hour, $minute);
+                $slotEnd = $slotStart->copy()->addMinutes(30);
+
+                $isPast = $slotStart->isPast();
+
+                $isBusy = collect($busyWindows)->contains(function (array $window) use ($slotStart, $slotEnd) {
+                    return $slotStart->lt($window['end']) && $slotEnd->gt($window['start']);
+                });
+
+                $slots[] = [
+                    'start' => $slotStart->format('Y-m-d\TH:i'),
+                    'label' => $slotStart->format('g:i A'),
+                    'available' => !$isPast && !$isBusy,
+                    'reason' => $isPast ? 'Past time' : ($isBusy ? 'Booked' : null),
+                ];
+            }
+        }
+
+        return $slots;
+    }
+
+    /**
+     * Collect busy windows from internal bookings and Outlook calendar.
+     */
+    private function getBusyWindowsForAdviser(User $adviser, Carbon $start, Carbon $end): array
+    {
+        $windows = [];
+
+        $bookings = Booking::where('adviser_id', $adviser->id)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereBetween('preferred_datetime', [$start, $end])
+            ->get(['preferred_datetime']);
+
+        foreach ($bookings as $booking) {
+            $bookingStart = $booking->preferred_datetime->copy();
+            $windows[] = [
+                'start' => $bookingStart,
+                'end' => $bookingStart->copy()->addMinutes(30),
+            ];
+        }
+
+        if ($adviser->hasMicrosoftToken()) {
+            try {
+                $graph = new MicrosoftGraphService($adviser);
+                $events = $graph->getAvailability($start, $end);
+
+                foreach ($events as $event) {
+                    $eventStartRaw = $event['start']['dateTime'] ?? null;
+                    $eventEndRaw = $event['end']['dateTime'] ?? null;
+
+                    if (!$eventStartRaw || !$eventEndRaw) {
+                        continue;
+                    }
+
+                    $windows[] = [
+                        'start' => Carbon::parse($eventStartRaw),
+                        'end' => Carbon::parse($eventEndRaw),
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::warning('Slot picker Outlook availability fetch failed.', [
+                    'adviser_id' => $adviser->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $windows;
+    }
+
+    /**
      * Sync booking status changes to connected Outlook calendars.
      * - confirmed/completed: create or update events
      * - denied/cancelled: delete events and clear stored IDs
@@ -219,7 +365,6 @@ class BookingController extends Controller
 
     /**
      * Resolve adviser and expertise for a student booking from registration data.
-     * Priority:
      * 1) Student's preferred adviser (if set and matches any student module)
      * 2) Any matching adviser with the lowest active workload
      */
@@ -298,7 +443,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        return view('bookings.show', compact('booking'));
+        return view('bookings.show', ['booking' => $booking]);
     }
 
     /**

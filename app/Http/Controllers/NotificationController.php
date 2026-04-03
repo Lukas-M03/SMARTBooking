@@ -13,7 +13,7 @@ class NotificationController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(7);
 
-        return view('notifications.index', compact('notifications'));
+        return view('notifications.index', ['notifications' => $notifications]);
     }
 
     public function markAsRead($id)

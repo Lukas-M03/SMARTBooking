@@ -6,7 +6,7 @@
             @csrf
 
             <div class="form-group">
-                <x-form.group mode="input" name="topic" label="Meeting Topic" :value="old('topic')" type="text" required
+                <x-form.group mode="input" name="topic" label="Meeting Topic" :value="old('topic')" type="text"
                     placeholder="e.g., Dissertation guidance, Assignment help" />
             </div>
 
@@ -15,9 +15,17 @@
                     rows="4" placeholder="Provide more details about your query..." />
             </div>
 
-            <div class="form-group">
-                <x-form.group mode="input" name="preferred_datetime" label="Preferred Date & Time" :value="old('preferred_datetime')"
-                    type="datetime-local" required />
+            <div class="form-group booking-slot-picker" id="bookingSlotPicker" data-slots-url="{{ route('bookings.available-slots') }}"
+                data-old-datetime="{{ old('preferred_datetime') }}">
+                <x-form.label for="booking_slot_date">Preferred Date & Time</x-form.label>
+                <p class="booking-slot-hint" id="bookingSlotHint">Select a date to load available 30-minute slots.</p>
+
+                <input id="booking_slot_date" type="date" class="booking-slot-date-input" required>
+                <input type="hidden" name="preferred_datetime" id="preferred_datetime" value="{{ old('preferred_datetime') }}" required>
+
+                <div class="booking-slot-grid" id="bookingSlotGrid" aria-live="polite"></div>
+
+                <x-form.error name="preferred_datetime" />
             </div>
 
             <div class="form-group">

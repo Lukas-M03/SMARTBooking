@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Notification;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -43,7 +42,12 @@ class DashboardController extends Controller
             'notifications_total' => Notification::where('user_id', $user->id)->count(),
         ];
 
-        return view('dashboards.student', compact('upcomingBookings', 'recentBookings', 'notifications', 'stats'));
+        return view('dashboards.student', [
+            'upcomingBookings' => $upcomingBookings,
+            'recentBookings' => $recentBookings,
+            'notifications' => $notifications,
+            'stats' => $stats,
+        ]);
     }
 
     /**
@@ -80,7 +84,12 @@ class DashboardController extends Controller
             'notifications_total' => Notification::where('user_id', $user->id)->count(),
         ];
 
-        return view('dashboards.adviser', compact('pendingBookings', 'upcomingBookings', 'notifications', 'stats'));
+        return view('dashboards.adviser', [
+            'pendingBookings' => $pendingBookings,
+            'upcomingBookings' => $upcomingBookings,
+            'notifications' => $notifications,
+            'stats' => $stats,
+        ]);
     }
 
     /**
@@ -100,6 +109,12 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('dashboards.admin', compact('totalBookings', 'totalUsers', 'pendingBookings', 'confirmedBookings', 'recentBookings'));
+        return view('dashboards.admin', [
+            'totalBookings' => $totalBookings,
+            'totalUsers' => $totalUsers,
+            'pendingBookings' => $pendingBookings,
+            'confirmedBookings' => $confirmedBookings,
+            'recentBookings' => $recentBookings,
+        ]);
     }
 }
