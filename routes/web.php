@@ -41,17 +41,17 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Student Routes
-Route::middleware(['auth'])->prefix('student')->group(function () {
+Route::middleware(['auth', 'student'])->prefix('student')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'student'])->name('student.dashboard');
 });
 
 // Adviser Routes
-Route::middleware(['auth'])->prefix('adviser')->group(function () {
+Route::middleware(['auth', 'adviser'])->prefix('adviser')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adviser'])->name('adviser.dashboard');
 });
 
 // Admin Routes
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::get('/users', [DashboardController::class, 'adminUsers'])->name('admin.users');
     Route::get('/bookings/completed', [DashboardController::class, 'adminCompletedBookings'])->name('admin.bookings.completed');

@@ -30,6 +30,13 @@
 
     <!-- Authenticated Navbar -->
     @auth
+        @php
+            $currentUser = Auth::user();
+            $isStudent = $currentUser->isStudent();
+            $isAdviser = $currentUser->isAdviser();
+            $isAdmin = $currentUser->isAdmin();
+        @endphp
+
         <nav class="navbar">
             <a href="{{ url('/') }}" class="logo">SMART Booking</a>
 
@@ -39,27 +46,31 @@
             </button>
             <div class="nav-buttons" id="auth-nav-menu">
                 <div class="nav-main-links">
-                    @if (Auth::user()->isStudent())
+                    @if ($isStudent)
                         <a href="{{ route('student.dashboard') }}" class="nav-link">Dashboard</a>
                         <a href="{{ route('bookings.create') }}" class="nav-link">New Booking</a>
                         <a href="{{ route('bookings.index') }}" class="nav-link">My Bookings</a>
-                    @elseif(Auth::user()->isAdviser())
+                    @elseif($isAdviser)
                         <a href="{{ route('adviser.dashboard') }}" class="nav-link">Dashboard</a>
                         <a href="{{ route('bookings.index') }}" class="nav-link">Bookings</a>
                         <a href="{{ route('bookings.index', ['status' => 'completed']) }}" class="nav-link">Completed Meetings</a>
-                    @elseif(Auth::user()->isAdmin())
+                    @elseif($isAdmin)
                         <a href="{{ route('admin.dashboard') }}" class="nav-link">Dashboard</a>
                     @endif
                 </div>
 
                 <div class="nav-utility-links">
-                    @if (Auth::user()->hasMicrosoftToken())
-                        <a href="{{ route('microsoft.disconnect') }}" class="outlook-link-disconnect">Disconnect Outlook</a>
-                    @else
-                        <a href="{{ route('microsoft.redirect') }}" class="outlook-link">Connect Outlook</a>
+                    @if ($isStudent || $isAdviser)
+                        @if ($currentUser->hasMicrosoftToken())
+                            <a href="{{ route('microsoft.disconnect') }}" class="outlook-link-disconnect">Disconnect Outlook</a>
+                        @else
+                            <a href="{{ route('microsoft.redirect') }}" class="outlook-link">Connect Outlook</a>
+                        @endif
                     @endif
 
-                    <a href="{{ route('notifications.index') }}" class="nav-link">Notifications</a>
+                    @if ($isStudent || $isAdviser)
+                        <a href="{{ route('notifications.index') }}" class="nav-link">Notifications</a>
+                    @endif
 
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
