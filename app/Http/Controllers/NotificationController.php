@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification as NotificationModel;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
@@ -12,7 +11,7 @@ class NotificationController extends Controller
     {
         $notifications = NotificationModel::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(7);
 
         return view('notifications.index', compact('notifications'));
     }

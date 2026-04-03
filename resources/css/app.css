@@ -69,6 +69,10 @@
     margin-top: 3px;
 }
 
+.completion-notes-form-actions {
+    margin-top: 15px !important;
+}
+
 tr {
     border-bottom: 2px solid #ccc;
 }
@@ -373,6 +377,22 @@ td {
     border-radius: 5px;
 }
 
+.notifications-pagination-plain {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.notifications-pagination-plain a,
+.notifications-pagination-plain span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+}
+
 .div-recent-notifications {
     padding: 14px;
     margin-bottom: 14px;
@@ -380,6 +400,14 @@ td {
     border-left-style: solid;
     background: #e6e6e6;
     border-radius: 5px;
+}
+
+.modal-message-content {
+    padding-left: 10px;
+}
+
+.modal-header-content {
+    padding-left: 10px;
 }
 
 /* =========================
@@ -756,7 +784,7 @@ td {
 }
 
 .card-colour {
-    background: linear-gradient(135deg, #84848a 0%, #b7b4ba 100%);
+    background: linear-gradient(135deg, #dad8d1 0%, #adaba9 100%);
     color: white;
     transition: transform 0.3s, box-shadow 0.3s;
 }

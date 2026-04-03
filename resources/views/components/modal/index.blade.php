@@ -26,13 +26,13 @@
 
         <!-- Modal header -->        
         @isset($header)
-            <div class="text-lg font-semibold mb-4 border-b border-gray-200 pb-3 ">
+            <div class="text-lg font-semibold mb-4 border-b border-gray-200 pb-3 modal-header-content">
                 {{ $header }}
             </div>
         @endisset
 
         <!-- Modal content -->
-        <div class="text-gray-700">
+        <div class="text-gray-700 modal-message-content">
             {{ $slot }}
         </div>
 

@@ -55,9 +55,29 @@
                 </div>
             @endforeach
 
-            <div class="mt-7">
-                {{ $notifications->links() }}
-            </div>
+            @if ($notifications->hasPages())
+                <div class="mt-7 notifications-pagination-plain">
+                    @if ($notifications->onFirstPage())
+                        <span>&lsaquo;</span>
+                    @else
+                        <a href="{{ $notifications->previousPageUrl() }}" rel="prev">&lsaquo;</a>
+                    @endif
+
+                    @foreach ($notifications->getUrlRange(1, $notifications->lastPage()) as $page => $url)
+                        @if ($page == $notifications->currentPage())
+                            <span>{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if ($notifications->hasMorePages())
+                        <a href="{{ $notifications->nextPageUrl() }}" rel="next">&rsaquo;</a>
+                    @else
+                        <span>&rsaquo;</span>
+                    @endif
+                </div>
+            @endif
             <div class="mt-7 flex justify-end">
                 <x-modal.open target="delete-all-notifications" class="hover:text-red-400 text-red-600 text-base font-semibold py-1 px-3 cursor-pointer hover:underline">Delete All Notifications</x-modal.open>
 

@@ -92,7 +92,7 @@
                         :value="old('completion_notes', $booking->completion_notes)" rows="4"
                         placeholder="Add or update notes for this completed booking..." />
 
-                    <div class="flex gap-3">
+                    <div class="completion-notes-form-actions flex gap-3">
                         <button type="submit" class="btn btn-success">Save Notes</button>
                         <button type="button" onclick="toggleAdviserNotesEdit()" class="btn btn-warning">Cancel Edit</button>
                     </div>
