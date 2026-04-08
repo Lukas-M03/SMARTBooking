@@ -19,16 +19,11 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         $upcomingBookings = Booking::where('student_id', $user->id)
+            ->with(['adviser'])
             ->whereIn('status', ['pending', 'confirmed'])
             ->where('preferred_datetime', '>=', now())
             ->orderBy('preferred_datetime', 'asc')
-            ->take(5)
-            ->get();
-
-        $recentBookings = Booking::where('student_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->paginate(5);
 
         $notifications = Notification::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -45,7 +40,6 @@ class DashboardController extends Controller
 
         return view('dashboards.student', [
             'upcomingBookings' => $upcomingBookings,
-            'recentBookings' => $recentBookings,
             'notifications' => $notifications,
             'stats' => $stats,
         ]);

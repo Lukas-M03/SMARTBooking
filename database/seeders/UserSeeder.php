@@ -60,31 +60,43 @@ class UserSeeder extends Seeder
 
         // Create Sample Students
         // Students are also idempotent to avoid duplicate records across runs.
-        User::updateOrCreate(['email' => 'john.smith@student.ac.uk'], [
+        $john = User::updateOrCreate(['email' => 'john.smith@student.ac.uk'], [
             'name' => 'John Smith',
             'email' => 'john.smith@student.ac.uk',
             'password' => Hash::make('password'),
             'role' => 'student',
             'student_id' => 'ST2024001',
             'phone' => '+44 7700 900001',
+            'preferred_adviser_id' => $adviser1->id,
+        ]);
+        $john->modules()->sync([
+            Expertise::where('name', 'Computer Science')->firstOrFail()->id
         ]);
 
-        User::updateOrCreate(['email' => 'emma.johnson@student.ac.uk'], [
+        $emma = User::updateOrCreate(['email' => 'emma.johnson@student.ac.uk'], [
             'name' => 'Emma Johnson',
             'email' => 'emma.johnson@student.ac.uk',
             'password' => Hash::make('password'),
             'role' => 'student',
             'student_id' => 'ST2024002',
             'phone' => '+44 7700 900002',
+            'preferred_adviser_id' => $adviser2->id,
+        ]);
+        $emma->modules()->sync([
+            Expertise::where('name', 'Mathematics')->firstOrFail()->id
         ]);
 
-        User::updateOrCreate(['email' => 'james.williams@student.ac.uk'], [
+        $james = User::updateOrCreate(['email' => 'james.williams@student.ac.uk'], [
             'name' => 'James Williams',
             'email' => 'james.williams@student.ac.uk',
             'password' => Hash::make('password'),
             'role' => 'student',
             'student_id' => 'ST2024003',
             'phone' => '+44 7700 900003',
+            'preferred_adviser_id' => $adviser3->id,
+        ]);
+        $james->modules()->sync([
+            Expertise::where('name', 'Biology')->firstOrFail()->id
         ]);
     }
 }

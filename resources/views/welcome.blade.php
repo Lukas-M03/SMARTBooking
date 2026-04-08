@@ -1,7 +1,7 @@
 <x-layout>
     <div class="hero">
-        <h1>Welcome to SMART Booking</h1>
-        <p>
+        <h1 class="text-gray-700">Welcome to SMART Booking</h1>
+        <p class="text-gray-700"> 
             Streamlined Meeting Appointments & Resource Tracking - Simplifying student-adviser bookings with automated matching, real-time availability, and intelligent notifications.
         </p>
         <div class="hero-buttons">

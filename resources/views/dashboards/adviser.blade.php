@@ -48,6 +48,8 @@
         </a>
     </div>
 
+    @include('bookingsView.adviserBooking')
+
     <div class="calendar-card-info calendar-card">
         <div class="calendar-header">
             <h3 class="text-gray-600 mt-2 font-bold">Your Bookings Calendar</h3>
@@ -56,6 +58,6 @@
         <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
     </div>
 
-    @include('bookingsView.adviserBooking')
+    
 
 </x-layout>

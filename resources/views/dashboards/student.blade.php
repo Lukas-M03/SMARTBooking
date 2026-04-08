@@ -26,6 +26,8 @@
     </div>
 </div>
 
+@include('bookingsView.studentBooking')
+
 <div class="grid-cards">
     <a href="{{ route('bookings.index') }}" class="card card-colour">
         <h3 class="text-black font-bold">Total Bookings</h3>
@@ -53,6 +55,6 @@
     <div class="booking-calendar js-booking-calendar" data-events-url="{{ route('calendar.events') }}"></div>
 </div>
 
-@include('bookingsView.studentBooking')
+
 
 </x-layout>

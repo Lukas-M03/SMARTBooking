@@ -788,6 +788,21 @@ td {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
+.btn-back,
+.btn-back:visited {
+    background: #ffc107;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.btn-back:hover,
+.btn-back:focus-visible {
+    color: #333;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .features {
     background: white;
     padding: 64px 20px;
@@ -802,11 +817,6 @@ td {
     text-align: center;
     border-radius: 10px;
     transition: all 0.3s;
-}
-
-.feature:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .feature h3 {
@@ -839,8 +849,9 @@ td {
 }
 
 .card-colour {
-    background: linear-gradient(135deg, #dad8d1 0%, #adaba9 100%);
-    color: white;
+    background: white;
+    color: navy;
+    border: darkblue 1px solid;
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
