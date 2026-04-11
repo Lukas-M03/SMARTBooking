@@ -130,4 +130,30 @@ class DashboardController extends Controller
             'completedBookings' => $completedBookings,
         ]);
     }
+
+    public function adminDeleteUser(User $user)
+    {
+        $admin = Auth::user();
+
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Admin users cannot be deleted from this screen.');
+        }
+
+        if ((int) $admin->id === (int) $user->id) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return back()->with('success', "User '{$name}' deleted successfully.");
+    }
+
+    public function adminDeleteBooking(Booking $booking)
+    {
+        $topic = $booking->topic;
+        $booking->delete();
+
+        return back()->with('success', "Booking '{$topic}' deleted successfully.");
+    }
 }

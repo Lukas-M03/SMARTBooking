@@ -38,6 +38,10 @@ class BookingController extends Controller
 
         $bookings = $query->orderBy('preferred_datetime', 'asc')->get();
 
+        if ($request->expectsJson()) {
+            return response()->json(['data' => $bookings]);
+        }
+
         return view('bookings.index', ['bookings' => $bookings]);
     }
 
@@ -94,6 +98,38 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->expectsJson()) {
+            $validated = $request->validate([
+                'adviser_id' => ['required', 'exists:users,id'],
+                'expertise_id' => ['required', 'exists:expertise,id'],
+                'topic' => ['required', 'string', 'max:40'],
+                'description' => ['nullable', 'string'],
+                'preferred_datetime' => ['required', 'date', 'after:now'],
+                'meeting_type' => ['required', 'in:in-person,online,phone'],
+            ]);
+
+            $booking = Booking::create([
+                'student_id' => Auth::id(),
+                'adviser_id' => $validated['adviser_id'],
+                'expertise_id' => $validated['expertise_id'],
+                'topic' => $validated['topic'],
+                'description' => $validated['description'] ?? null,
+                'preferred_datetime' => Carbon::parse($validated['preferred_datetime']),
+                'meeting_type' => $validated['meeting_type'],
+                'status' => 'pending',
+            ]);
+
+            Notification::create([
+                'user_id' => $validated['adviser_id'],
+                'booking_id' => $booking->id,
+                'title' => 'New Booking Request',
+                'message' => "You have received a new booking request for: {$booking->topic}",
+                'type' => 'booking_created',
+            ]);
+
+            return response()->json(['data' => $booking], 201);
+        }
+
         $validated = $request->validate([
             'topic' => ['required', 'string', 'max:40'],
             'description' => ['nullable', 'string'],
@@ -137,7 +173,7 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'Booking Request Submitted',
             'message' => "Your booking request for '" . $validated['topic'] . "' has been submitted and is awaiting confirmation.",
-            'type' => 'success',
+            'type' => 'reminder',
         ]);
 
         Notification::create([
@@ -145,7 +181,7 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'New Booking Request',
             'message' => "New booking request from " . Auth::user()->name . " for '" . $validated['topic'] . "'.",
-            'type' => 'info',
+            'type' => 'booking_created',
         ]);
 
         // Best-effort Outlook sync: booking succeeds even if external API fails.
@@ -451,7 +487,7 @@ class BookingController extends Controller
      * Updates booking status to 'confirmed' and sets a 90-day scheduled deletion date.
      * Sends confirmation notification to the student.
      */
-    public function confirm(Booking $booking)
+    public function confirm(Request $request, Booking $booking)
     {
         $user = Auth::user();
 
@@ -472,8 +508,12 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'Booking Confirmed',
             'message' => "Your booking for '" . $booking->topic . "' has been confirmed by " . $user->name . ".",
-            'type' => 'success',
+            'type' => 'booking_confirmed',
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Booking confirmed successfully.']);
+        }
 
         return back()->with('success', 'Booking confirmed successfully!');
     }
@@ -498,6 +538,7 @@ class BookingController extends Controller
         $booking->update([
             'status' => 'denied',
             'denial_reason' => $validated['denial_reason'] ?? 'Booking request denied.',
+            'scheduled_deletion_at' => now()->addDays(90),
         ]);
 
         $this->syncBookingStatusToOutlook($booking);
@@ -507,8 +548,12 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'Booking Denied',
             'message' => "Your booking for '" . $booking->topic . "' has been denied. Reason: " . ($validated['denial_reason'] ?? 'Not specified.'),
-            'type' => 'warning',
+            'type' => 'booking_denied',
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Booking denied.']);
+        }
 
         return back()->with('success', 'Booking denied.');
     }
@@ -525,7 +570,10 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $booking->update(['status' => 'cancelled']);
+        $booking->update([
+            'status' => 'cancelled',
+            'scheduled_deletion_at' => now()->addDays(90),
+        ]);
 
         $this->syncBookingStatusToOutlook($booking);
 

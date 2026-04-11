@@ -21,6 +21,7 @@
                         <th class="py-3 pr-4">Email</th>
                         <th class="py-3 pr-4">Student ID</th>
                         <th class="py-3">Created</th>
+                        <th class="py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,13 @@
                             <td class="py-3 pr-4">{{ $student->email }}</td>
                             <td class="py-3 pr-4">{{ $student->student_id ?? 'N/A' }}</td>
                             <td class="py-3">{{ $student->created_at?->format('M d, Y') ?? 'N/A' }}</td>
+                            <td class="py-3">
+                                <form method="POST" action="{{ route('admin.users.delete', $student) }}" onsubmit="return confirm('Delete this student and related records?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -52,6 +60,7 @@
                         <th class="py-3 pr-4">Email</th>
                         <th class="py-3 pr-4">Phone</th>
                         <th class="py-3">Created</th>
+                        <th class="py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -61,6 +70,13 @@
                             <td class="py-3 pr-4">{{ $adviser->email }}</td>
                             <td class="py-3 pr-4">{{ $adviser->phone ?? 'N/A' }}</td>
                             <td class="py-3">{{ $adviser->created_at?->format('M d, Y') ?? 'N/A' }}</td>
+                            <td class="py-3">
+                                <form method="POST" action="{{ route('admin.users.delete', $adviser) }}" onsubmit="return confirm('Delete this adviser and related records?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

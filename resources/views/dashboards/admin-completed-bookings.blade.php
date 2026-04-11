@@ -21,6 +21,7 @@
                         <th class="py-3 pr-4">Expertise</th>
                         <th class="py-3 pr-4">Topic</th>
                         <th class="py-3">Adviser Notes</th>
+                        <th class="py-3">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,13 @@
                             <td class="py-3 pr-4">{{ $booking->expertise?->name ?? 'N/A' }}</td>
                             <td class="py-3 pr-4">{{ $booking->topic ?? 'N/A' }}</td>
                             <td class="py-3">{{ $booking->completion_notes ?: 'No notes provided.' }}</td>
+                            <td class="py-3">
+                                <form method="POST" action="{{ route('admin.bookings.delete', $booking) }}" onsubmit="return confirm('Delete this booking permanently?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

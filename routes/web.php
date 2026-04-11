@@ -55,6 +55,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
     Route::get('/users', [DashboardController::class, 'adminUsers'])->name('admin.users');
     Route::get('/bookings/completed', [DashboardController::class, 'adminCompletedBookings'])->name('admin.bookings.completed');
+    Route::delete('/users/{user}', [DashboardController::class, 'adminDeleteUser'])->name('admin.users.delete');
+    Route::delete('/bookings/{booking}', [DashboardController::class, 'adminDeleteBooking'])->name('admin.bookings.delete');
 });
 
 // Booking Routes
@@ -94,3 +96,19 @@ Route::get('/auth/callback', [MicrosoftAuthController::class, 'handleCallback'])
 Route::middleware(['auth'])->group(function () {
     Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 });
+
+// API-compatible routes used by automated tests.
+Route::prefix('api')->middleware('auth')->group(function () {
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::put('/bookings/{booking}/confirm', [BookingController::class, 'confirm']);
+    Route::put('/bookings/{booking}/deny', [BookingController::class, 'deny']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
+    Route::put('/notifications/{notification}/mark-read', [NotificationController::class, 'markRead']);
+    Route::put('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+});
+
+// API Routes
+require __DIR__.'/api.php';
