@@ -149,4 +149,70 @@ class BookingTest extends TestCase
         $this->postJson('/bookings', [])
             ->assertStatus(401);
     }
+
+    public function test_student_cannot_confirm_booking()
+    {
+        $booking = Booking::factory()->pending()->create();
+        $student = User::factory()->student()->create();
+
+        $this->actingAs($student)
+            ->putJson("/bookings/{$booking->id}/confirm", [
+                'confirmed_datetime' => now()->addDays(2)->toDateTimeString(),
+            ])
+            ->assertStatus(403);
+    }
+
+    public function test_third_party_cannot_cancel_booking()
+    {
+        $booking = Booking::factory()->pending()->create();
+        $other = User::factory()->create();
+
+        $this->actingAs($other)
+            ->post("/bookings/{$booking->id}/cancel")
+            ->assertStatus(403);
+    }
+
+    public function test_student_can_cancel_booking()
+    {
+        $booking = Booking::factory()->pending()->create();
+
+        $this->actingAs($booking->student)
+            ->post("/bookings/{$booking->id}/cancel")
+            ->assertRedirect();
+
+        $this->assertEquals('cancelled', $booking->fresh()->status);
+    }
+
+    public function test_adviser_can_cancel_booking()
+    {
+        $booking = Booking::factory()->pending()->create();
+
+        $this->actingAs($booking->adviser)
+            ->post("/bookings/{$booking->id}/cancel")
+            ->assertRedirect();
+
+        $this->assertEquals('cancelled', $booking->fresh()->status);
+    }
+
+    public function test_adviser_can_complete_confirmed_booking()
+    {
+        $booking = Booking::factory()->confirmed()->create();
+
+        $this->actingAs($booking->adviser)
+            ->post("/bookings/{$booking->id}/complete")
+            ->assertRedirect();
+
+        $this->assertEquals('completed', $booking->fresh()->status);
+    }
+
+    public function test_adviser_can_delete_denied_booking()
+    {
+        $booking = Booking::factory()->denied()->create();
+
+        $this->actingAs($booking->adviser)
+            ->delete("/bookings/{$booking->id}")
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('bookings', ['id' => $booking->id]);
+    }
 }

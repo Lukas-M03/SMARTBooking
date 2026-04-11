@@ -48,4 +48,31 @@ class UserTest extends TestCase
 
         $this->assertCount(2, $adviser->fresh()->adviserBookings);
     }
+
+    public function test_has_microsoft_token_returns_false_when_no_token()
+    {
+        $user = User::factory()->create(['microsoft_token' => null]);
+
+        $this->assertFalse($user->hasMicrosoftToken());
+    }
+
+    public function test_has_microsoft_token_returns_false_when_token_is_expired()
+    {
+        $user = User::factory()->create([
+            'microsoft_token' => 'some-token',
+            'microsoft_token_expires_at' => now()->subMinutes(5),
+        ]);
+
+        $this->assertFalse($user->hasMicrosoftToken());
+    }
+
+    public function test_has_microsoft_token_returns_true_when_token_is_valid()
+    {
+        $user = User::factory()->create([
+            'microsoft_token' => 'some-token',
+            'microsoft_token_expires_at' => now()->addHour(),
+        ]);
+
+        $this->assertTrue($user->hasMicrosoftToken());
+    }
 }

@@ -600,7 +600,7 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'Booking Cancelled',
             'message' => "The booking for '" . $booking->topic . "' has been cancelled by " . $user->name . ".",
-            'type' => 'warning',
+            'type' => 'booking_cancelled',
         ]);
 
         return back()->with('success', 'Booking cancelled successfully.');
@@ -637,7 +637,7 @@ class BookingController extends Controller
             'booking_id' => $booking->id,
             'title' => 'Booking Completed',
             'message' => "Your booking for '" . $booking->topic . "' has been marked as completed.",
-            'type' => 'success',
+            'type' => 'booking_completed',
         ]);
         return back()->with('success', 'Booking marked as completed.');
     }

@@ -18,9 +18,12 @@ return new class extends Migration
             $table->dateTime('preferred_datetime');
             $table->enum('meeting_type', ['in-person', 'online', 'phone'])->default('in-person');
             $table->enum('status', ['pending', 'confirmed', 'denied', 'cancelled', 'completed'])->default('pending');
-            $table->text('adviser_notes')->nullable();
+            $table->text('denial_reason')->nullable();
+            $table->text('completion_notes')->nullable();
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('scheduled_deletion_at')->nullable();
+            $table->string('student_outlook_event_id')->nullable();
+            $table->string('adviser_outlook_event_id')->nullable();
             $table->timestamps();
         });
     }

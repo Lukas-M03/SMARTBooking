@@ -18,28 +18,28 @@ class NotificationFactory extends Factory
             'booking_id' => Booking::factory(),
             'title' => $this->faker->sentence(),
             'message' => $this->faker->paragraph(),
-            'type' => $this->faker->randomElement(['booking_confirmed', 'booking_denied', 'booking_created', 'reminder']),
+            'type' => $this->faker->randomElement(['booking_confirmed', 'booking_denied', 'booking_created', 'booking_cancelled', 'booking_completed', 'reminder']),
             'is_read' => false,
         ];
     }
 
     public function read(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'is_read' => true,
         ]);
     }
 
     public function unread(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'is_read' => false,
         ]);
     }
 
     public function bookingConfirmed(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'type' => 'booking_confirmed',
             'title' => 'Booking Confirmed',
             'message' => 'Your booking has been confirmed by the adviser.',
@@ -48,7 +48,7 @@ class NotificationFactory extends Factory
 
     public function bookingDenied(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn () => [
             'type' => 'booking_denied',
             'title' => 'Booking Denied',
             'message' => 'Your booking has been denied by the adviser.',

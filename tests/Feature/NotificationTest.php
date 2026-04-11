@@ -139,4 +139,28 @@ class NotificationTest extends TestCase
 
         $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);
     }
+
+    public function test_user_cannot_view_another_users_notification()
+    {
+        $notification = Notification::factory()->create();
+        /** @var User $other */
+        $other = User::factory()->create();
+
+        $this->actingAs($other)
+            ->getJson("/notifications/{$notification->id}")
+            ->assertStatus(404);
+    }
+
+    public function test_user_cannot_delete_another_users_notification()
+    {
+        $notification = Notification::factory()->create();
+        /** @var User $other */
+        $other = User::factory()->create();
+
+        $this->actingAs($other)
+            ->deleteJson("/notifications/{$notification->id}")
+            ->assertStatus(404);
+
+        $this->assertDatabaseHas('notifications', ['id' => $notification->id]);
+    }
 }

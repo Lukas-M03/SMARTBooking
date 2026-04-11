@@ -126,7 +126,7 @@
                                 <form method="POST" action="{{ route('bookings.destroy', $booking) }}" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Delete</button>
+                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Delete</button>
                                 </form>
                             </div>
                         </x-slot:footer>
@@ -148,7 +148,7 @@
                                 <x-modal.close target="cancel-booking" class="btn hover:bg-green-500 hover:text-white">Keep Booking</x-modal.close>
                                 <form method="POST" action="{{ route('bookings.cancel', $booking) }}" class="inline">
                                     @csrf
-                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Yes, Cancel</button>
+                                    <button type="submit" class="btn hover:bg-red-500 hover:text-white">Cancel</button>
                                 </form>
                             </div>
                         </x-slot:footer>

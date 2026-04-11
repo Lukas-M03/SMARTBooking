@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('message');
-            $table->enum('type', ['booking_confirmed', 'booking_denied', 'booking_created', 'reminder'])->default('reminder');
+            $table->enum('type', ['booking_confirmed', 'booking_denied', 'booking_created', 'booking_cancelled', 'booking_completed', 'reminder'])->default('reminder');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

@@ -17,6 +17,13 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['student', 'adviser', 'admin'])->default('student');
+            $table->string('student_id')->nullable();
+            $table->string('phone')->nullable();
+            $table->foreignId('preferred_adviser_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->text('microsoft_token')->nullable();
+            $table->text('microsoft_refresh_token')->nullable();
+            $table->timestamp('microsoft_token_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
