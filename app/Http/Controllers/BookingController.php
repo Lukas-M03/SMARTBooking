@@ -108,6 +108,20 @@ class BookingController extends Controller
                 'meeting_type' => ['required', 'in:in-person,online,phone'],
             ]);
 
+            $adviser = User::query()
+                ->whereKey($validated['adviser_id'])
+                ->where('role', 'adviser')
+                ->whereHas('expertise', function ($query) use ($validated) {
+                    $query->whereKey($validated['expertise_id']);
+                })
+                ->first();
+
+            if (!$adviser) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'adviser_id' => 'The selected adviser does not teach the selected expertise.',
+                ]);
+            }
+
             $booking = Booking::create([
                 'student_id' => Auth::id(),
                 'adviser_id' => $validated['adviser_id'],
@@ -126,6 +140,8 @@ class BookingController extends Controller
                 'message' => "You have received a new booking request for: {$booking->topic}",
                 'type' => 'booking_created',
             ]);
+
+            $booking->load(['student', 'adviser', 'expertise']);
 
             return response()->json(['data' => $booking], 201);
         }

@@ -1,8 +1,51 @@
 <?php
 
-describe('UserTest', function () {
-   it('does something', function () {
-       
-    });
-});
+namespace Tests\Unit\Models;
 
+use App\Models\Booking;
+use App\Models\Expertise;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
+
+class UserTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_user_password_is_hashed_on_creation()
+    {
+        $user = User::factory()->create(['password' => 'plain-password']);
+
+        $this->assertNotSame('plain-password', $user->password);
+        $this->assertTrue(Hash::check('plain-password', $user->password));
+    }
+
+    public function test_student_can_have_modules()
+    {
+        $student = User::factory()->student()->create();
+        $expertise = Expertise::factory()->create();
+
+        $student->modules()->attach($expertise->id);
+
+        $this->assertTrue($student->fresh()->modules->contains($expertise->id));
+    }
+
+    public function test_adviser_can_have_expertise()
+    {
+        $adviser = User::factory()->adviser()->create();
+        $expertise = Expertise::factory()->create();
+
+        $adviser->expertise()->attach($expertise->id);
+
+        $this->assertTrue($adviser->fresh()->expertise->contains($expertise->id));
+    }
+
+    public function test_user_can_have_bookings()
+    {
+        $adviser = User::factory()->adviser()->create();
+        Booking::factory()->count(2)->create(['adviser_id' => $adviser->id]);
+
+        $this->assertCount(2, $adviser->fresh()->adviserBookings);
+    }
+}

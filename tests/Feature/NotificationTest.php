@@ -13,15 +13,14 @@ class NotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function student_receives_notification_when_booking_confirmed()
+    public function test_student_receives_notification_when_booking_confirmed()
     {
         $booking = Booking::factory()->pending()->create();
         $student = $booking->student;
         $adviser = $booking->adviser;
 
         $this->actingAs($adviser)
-            ->putJson("/api/bookings/{$booking->id}/confirm", [
+            ->putJson("/bookings/{$booking->id}/confirm", [
                 'confirmed_datetime' => now()->addDays(2)->toDateTimeString(),
             ])
             ->assertStatus(200);
@@ -33,8 +32,7 @@ class NotificationTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function adviser_can_view_unread_notifications()
+    public function test_adviser_can_view_unread_notifications()
     {
         $adviser = User::factory()->adviser()->create();
         
@@ -42,20 +40,19 @@ class NotificationTest extends TestCase
         Notification::factory(2)->read()->create(['user_id' => $adviser->id]);
 
         $this->actingAs($adviser)
-            ->getJson('/api/notifications?unread=true')
+            ->getJson('/notifications?unread=true')
             ->assertStatus(200)
             ->assertJsonCount(3, 'data');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function student_receives_notification_when_booking_denied()
+    public function test_student_receives_notification_when_booking_denied()
     {
         $booking = Booking::factory()->pending()->create();
         $student = $booking->student;
         $adviser = $booking->adviser;
 
         $this->actingAs($adviser)
-            ->putJson("/api/bookings/{$booking->id}/deny", [
+            ->putJson("/bookings/{$booking->id}/deny", [
                 'denial_reason' => 'Not available at requested time',
             ])
             ->assertStatus(200);
@@ -67,35 +64,32 @@ class NotificationTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_mark_notification_as_read()
+    public function test_user_can_mark_notification_as_read()
     {
         $user = User::factory()->create();
         $notification = Notification::factory()->unread()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->putJson("/api/notifications/{$notification->id}/mark-read")
+            ->putJson("/notifications/{$notification->id}/read")
             ->assertStatus(200);
 
         $this->assertTrue($notification->fresh()->is_read);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_mark_all_notifications_as_read()
+    public function test_user_can_mark_all_notifications_as_read()
     {
         $user = User::factory()->create();
         Notification::factory(5)->unread()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->putJson('/api/notifications/mark-all-read')
+            ->putJson('/notifications/read-all')
             ->assertStatus(200);
 
         $unread = Notification::where('user_id', $user->id)->unread()->count();
         $this->assertEquals(0, $unread);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function notification_includes_booking_details()
+    public function test_notification_includes_booking_details()
     {
         $booking = Booking::factory()->create(['topic' => 'Assignment Help']);
         $notification = Notification::factory()->create([
@@ -105,13 +99,12 @@ class NotificationTest extends TestCase
         ]);
 
         $this->actingAs($booking->adviser)
-            ->getJson("/api/notifications/{$notification->id}")
+            ->getJson("/notifications/{$notification->id}")
             ->assertStatus(200)
             ->assertJsonFragment(['message' => 'You have received a new booking request for: Assignment Help']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function adviser_receives_notification_when_student_creates_booking()
+    public function test_adviser_receives_notification_when_student_creates_booking()
     {
         $student = User::factory()->student()->create();
         $adviser = User::factory()->adviser()->create();
@@ -119,7 +112,7 @@ class NotificationTest extends TestCase
         $adviser->expertise()->attach($expertise->id);
 
         $this->actingAs($student)
-            ->postJson('/api/bookings', [
+            ->postJson('/bookings', [
                 'adviser_id' => $adviser->id,
                 'expertise_id' => $expertise->id,
                 'topic' => 'Assignment Help',
@@ -135,14 +128,13 @@ class NotificationTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_delete_notification()
+    public function test_user_can_delete_notification()
     {
         $user = User::factory()->create();
         $notification = Notification::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user)
-            ->deleteJson("/api/notifications/{$notification->id}")
+            ->deleteJson("/notifications/{$notification->id}")
             ->assertStatus(200);
 
         $this->assertDatabaseMissing('notifications', ['id' => $notification->id]);

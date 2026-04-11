@@ -74,24 +74,6 @@ class NotificationController extends Controller
         return back()->with('success', 'All notifications marked as read.');
     }
 
-    public function markRead(Request $request, NotificationModel $notification)
-    {
-        abort_unless($notification->user_id === Auth::id(), 404);
-
-        $notification->markAsRead();
-
-        return response()->json(['message' => 'Notification marked as read.']);
-    }
-
-    public function markAllRead(Request $request)
-    {
-        NotificationModel::where('user_id', Auth::id())
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
-
-        return response()->json(['message' => 'All notifications marked as read.']);
-    }
-
     public function destroy(Request $request, $id)
     {
         $notification = NotificationModel::where('id', $id)

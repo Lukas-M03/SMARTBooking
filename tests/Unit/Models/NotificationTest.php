@@ -12,8 +12,7 @@ class NotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function notification_belongs_to_user()
+    public function test_notification_belongs_to_user()
     {
         $user = User::factory()->create();
         $booking = Booking::factory()->create();
@@ -23,8 +22,7 @@ class NotificationTest extends TestCase
         $this->assertEquals($user->id, $notification->user->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function notification_belongs_to_booking()
+    public function test_notification_belongs_to_booking()
     {
         $booking = Booking::factory()->create();
         $notification = Notification::factory()->create(['booking_id' => $booking->id]);
@@ -33,8 +31,7 @@ class NotificationTest extends TestCase
         $this->assertEquals($booking->id, $notification->booking->id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function unread_scope_filters_unread_notifications()
+    public function test_unread_scope_filters_unread_notifications()
     {
         $user = User::factory()->create();
         $booking = Booking::factory()->create();
@@ -48,8 +45,7 @@ class NotificationTest extends TestCase
         $unread->each(fn ($notif) => $this->assertFalse($notif->is_read));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function notification_can_be_marked_as_read()
+    public function test_notification_can_be_marked_as_read()
     {
         $notification = Notification::factory()->unread()->create();
 
@@ -60,8 +56,7 @@ class NotificationTest extends TestCase
         $this->assertTrue($notification->fresh()->is_read);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function notification_has_correct_type()
+    public function test_notification_has_correct_type()
     {
         $notifConfirmed = Notification::factory()->bookingConfirmed()->create();
         $notifDenied = Notification::factory()->bookingDenied()->create();

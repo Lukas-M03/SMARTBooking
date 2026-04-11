@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -12,8 +13,8 @@ use App\Http\Controllers\CalendarController;
 
 // Landing page
 Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
+    if (Auth::check()) {
+        $user = Auth::user();
         if ($user->isStudent()) {
             return redirect()->route('student.dashboard');
         } elseif ($user->isAdviser()) {
@@ -66,8 +67,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/available-slots', [BookingController::class, 'availableSlots'])->name('bookings.available-slots');
     Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
-    Route::post('/bookings/{booking}/deny', [BookingController::class, 'deny'])->name('bookings.deny');
+    Route::match(['POST', 'PUT'], '/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
+    Route::match(['POST', 'PUT'], '/bookings/{booking}/deny', [BookingController::class, 'deny'])->name('bookings.deny');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
     Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('bookings.complete');
     Route::put('/bookings/{booking}/update-comment', [BookingController::class, 'updateComment'])->name('bookings.updateComment');
@@ -77,8 +78,9 @@ Route::middleware(['auth'])->group(function () {
 // Notification Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::get('/notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::match(['POST', 'PUT'], '/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::match(['POST', 'PUT'], '/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::delete('/notifications', [NotificationController::class, 'deleteAll'])->name('notifications.delete-all');
 });
@@ -97,18 +99,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 });
 
-// API-compatible routes used by automated tests.
-Route::prefix('api')->middleware('auth')->group(function () {
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::put('/bookings/{booking}/confirm', [BookingController::class, 'confirm']);
-    Route::put('/bookings/{booking}/deny', [BookingController::class, 'deny']);
 
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::get('/notifications/{notification}', [NotificationController::class, 'show']);
-    Route::put('/notifications/{notification}/mark-read', [NotificationController::class, 'markRead']);
-    Route::put('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
-    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
-});
-
-// API Routes
-require __DIR__.'/api.php';
