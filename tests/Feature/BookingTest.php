@@ -11,8 +11,8 @@ use Tests\TestCase;
 
 class BookingTest extends TestCase
 {
-    use RefreshDatabase;
-
+    
+use RefreshDatabase;
     public function test_student_can_list_own_bookings()
     {
         $student = User::factory()->student()->create();

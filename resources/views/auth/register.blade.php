@@ -3,7 +3,7 @@
         <section class="login-reference-card" aria-labelledby="register-title">
             <h1 id="register-title" class="login-reference-title">Register</h1>
 
-            <form method="POST" action="{{ route('register') }}" class="login-reference-form" id="registerForm"
+            <form method="POST" action="{{ route('register') }}" class="login-reference-form" id="registerForm" novalidate
                 data-advisers='@json($advisers)' data-old-adviser="{{ old('preferred_adviser_id') }}"
                 data-old-module="{{ old('modules') }}">
                 @csrf
