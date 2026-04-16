@@ -358,12 +358,29 @@ class BookingController extends Controller
     {
         $booking->loadMissing(['student', 'adviser', 'expertise']);
 
+        $isCancelledOrDenied = in_array($booking->status, ['denied', 'cancelled', 'canceled'], true);
+
         $participants = collect([$booking->student, $booking->adviser])
-            ->filter(fn ($user) => $user && $user->hasMicrosoftToken())
+            ->filter(function ($user) use ($booking, $isCancelledOrDenied) {
+                if (!$user) {
+                    return false;
+                }
+                if ($user->hasMicrosoftToken()) {
+                    return true;
+                }
+                // For denial/cancellation, also include users whose token has expired
+                // but who still have a stored Outlook event that must be removed.
+                // MicrosoftGraphService will attempt to refresh the token automatically.
+                if ($isCancelledOrDenied && $user->microsoft_token) {
+                    $column = ((int) $user->id === (int) $booking->student_id)
+                        ? 'student_outlook_event_id'
+                        : 'adviser_outlook_event_id';
+                    return !empty($booking->{$column});
+                }
+                return false;
+            })
             ->unique('id')
             ->values();
-
-        $isCancelledOrDenied = in_array($booking->status, ['denied', 'cancelled', 'canceled'], true);
 
         foreach ($participants as $participant) {
             $eventColumn = ((int) $participant->id === (int) $booking->student_id)
