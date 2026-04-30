@@ -91,7 +91,7 @@ if ($confirm -eq "Y" -or $confirm -eq "y") {
   Write-Host "Extensions not installed.."
 }
 
-Copy the code above to a file named extvscode.ps1 in your Documents folder and open a 
+Copy the code above to a file named com621.ps1 in your Documents folder and open a 
 powershell terminal in this folder and execute the script.
 
 c:> .\com621.ps1
@@ -109,12 +109,46 @@ From the project root, run:
 
 ```powershell
 copy .env.example .env
-composer install
 php artisan key:generate
-php artisan migrate
-npm install
-npm run dev
 ```
 
-Then update values in `.env` for your local setup (database credentials, Microsoft app
-settings, mail settings, etc.).
+### 4) Database (SQLite — recommended)
+This project uses SQLite locally by default (`DB_CONNECTION=sqlite`).
+
+Create the SQLite database file if it doesn’t exist:
+```powershell
+if (!(Test-Path database\database.sqlite)) { New-Item -ItemType File database\database.sqlite | Out-Null }
+```
+
+Run migrations:
+```powershell
+php artisan migrate
+```
+
+### 5) Install frontend dependencies
+```powershell
+npm install
+```
+
+### 6) Start the dev environment
+```powershell
+composer run dev
+```
+
+Open:
+http://127.0.0.1:8000
+
+---
+
+## Viewing local database changes in real time (SQLite)
+The local database is stored here:
+- `database/database.sqlite`
+
+### Install a SQLite viewer in VS Code
+1. Open VS Code
+2. Go to **Extensions**
+3. Search for: **SQLite Viewer**
+4. Install: **SQLite Viewer** (by *qwtel*)
+5. Open the file `database/database.sqlite` in VS Code to browse tables/rows.
+
+As you use the local site (register, create records, etc.), refresh/reopen the DB view to see new/updated rows.
