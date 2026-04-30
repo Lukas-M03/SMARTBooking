@@ -8,11 +8,17 @@ use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
+    /**
+     * Show the forgot password request form.
+     */
     public function create()
     {
         return view('auth.forgot-password');
     }
 
+    /**
+     * Confirm the email address and redirect to the password reset screen.
+     */
     public function store(Request $request)
     {
         $request->validate([

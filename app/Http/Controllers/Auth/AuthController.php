@@ -11,11 +11,17 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    /**
+     * Show the login form.
+     */
     public function showLogin()
     {
         return view('auth.login');
     }
 
+    /**
+     * Validate login credentials and redirect the user to the correct dashboard.
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -47,6 +53,9 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
+    /**
+     * Show the registration form with available expertise and advisers.
+     */
     public function showRegister()
     {
         // Modules shown in registration come directly from the expertise table.
@@ -69,6 +78,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Create a new user account, attach any selected relations, and log the user in.
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -124,6 +136,9 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Log the current user out and clear the session.
+     */
     public function logout(Request $request)
     {
         Auth::logout();

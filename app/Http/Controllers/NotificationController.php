@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    /**
+     * Show the current user's notifications, optionally filtered to unread items.
+     */
     public function index(Request $request)
     {
         $query = NotificationModel::where('user_id', Auth::id())
@@ -28,6 +31,9 @@ class NotificationController extends Controller
         return view('notifications.index', ['notifications' => $notifications]);
     }
 
+    /**
+     * Display a single notification if the user owns it or is related to the booking.
+     */
     public function show(Request $request, NotificationModel $notification)
     {
         $user = Auth::user();
@@ -46,6 +52,9 @@ class NotificationController extends Controller
         return view('notifications.index', ['notifications' => collect([$notification])]);
     }
 
+    /**
+     * Mark one notification as read.
+     */
     public function markAsRead(Request $request, $id)
     {
         $notification = NotificationModel::where('id', $id)
@@ -61,6 +70,9 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification marked as read.');
     }
 
+    /**
+     * Mark all of the current user's unread notifications as read.
+     */
     public function markAllAsRead(Request $request)
     {
         NotificationModel::where('user_id', Auth::id())
@@ -74,6 +86,9 @@ class NotificationController extends Controller
         return back()->with('success', 'All notifications marked as read.');
     }
 
+    /**
+     * Delete a single notification owned by the current user.
+     */
     public function destroy(Request $request, $id)
     {
         $notification = NotificationModel::where('id', $id)
@@ -88,6 +103,9 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification deleted successfully.');
     }
 
+    /**
+     * Delete all notifications owned by the current user.
+     */
     public function deleteAll()
     {
         NotificationModel::where('user_id', Auth::id())->delete();

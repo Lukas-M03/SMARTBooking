@@ -103,6 +103,9 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Show the admin user management screen with all students and advisers.
+     */
     public function adminUsers()
     {
         $students = User::where('role', 'student')
@@ -119,6 +122,9 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Show a list of all completed bookings for admin review.
+     */
     public function adminCompletedBookings()
     {
         $completedBookings = Booking::with(['student', 'adviser', 'expertise'])
@@ -131,6 +137,9 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Delete a non-admin user from the admin user management screen.
+     */
     public function adminDeleteUser(User $user)
     {
         $admin = Auth::user();
@@ -149,6 +158,9 @@ class DashboardController extends Controller
         return back()->with('success', "User '{$name}' deleted successfully.");
     }
 
+    /**
+     * Delete a booking from the admin bookings screen.
+     */
     public function adminDeleteBooking(Booking $booking)
     {
         $topic = $booking->topic;

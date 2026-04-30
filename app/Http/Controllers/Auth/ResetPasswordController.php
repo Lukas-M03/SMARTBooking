@@ -11,6 +11,9 @@ use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
+    /**
+     * Show the password reset form for the given token.
+     */
     public function create(Request $request, string $token)
     {
         return view('auth.reset-password', [
@@ -19,6 +22,9 @@ class ResetPasswordController extends Controller
         ]);
     }
 
+    /**
+     * Validate the reset request and update the user's password.
+     */
     public function store(Request $request)
     {
         $request->validate([

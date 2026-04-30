@@ -91,7 +91,7 @@ if ($confirm -eq "Y" -or $confirm -eq "y") {
   Write-Host "Extensions not installed.."
 }
 
-Copy the code above to a file named com621.ps1 in your Documents folder and open a 
+Copy the code above to a file named extvscode.ps1 in your Documents folder and open a 
 powershell terminal in this folder and execute the script.
 
 c:> .\com621.ps1
