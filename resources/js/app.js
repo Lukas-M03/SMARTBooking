@@ -1,7 +1,13 @@
+// ── Imports ───────────────────────────────────────────────────────────────────
 import './bootstrap';
 
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
+
+// ── Booking Calendar ──────────────────────────────────────────────────────────
+// Initialises a FullCalendar on every element with the .js-booking-calendar
+// class. Switches between week view (mobile) and month view (desktop) and
+// reloads events from the URL stored in the element's data-events-url attribute.
 
 const calendarElements = document.querySelectorAll('.js-booking-calendar');
 
@@ -46,6 +52,11 @@ calendarElements.forEach((element) => {
 	calendar.render();
 });
 
+// ── Register Form ─────────────────────────────────────────────────────────────
+// Controls the registration page form:
+//   - Shows/hides fields based on the selected role (student vs adviser)
+//   - Filters the adviser dropdown to only advisers who cover the chosen module
+
 function initRegisterForm() {
 	// Only run registration logic on pages that actually have the register form.
 	const registerForm = document.getElementById('registerForm');
@@ -85,6 +96,8 @@ function initRegisterForm() {
 		}
 	};
 
+	// Show/hide role-specific fields depending on whether the user is registering
+	// as a student or an adviser.
 	const toggleRoleFields = () => {
 		const role = roleSelect?.value;
 
@@ -110,6 +123,8 @@ function initRegisterForm() {
 		setHidden(expertiseField, true);
 	};
 
+	// Rebuild the adviser dropdown so it only lists advisers whose expertise
+	// includes the module the student has selected.
 	const filterAdvisers = () => {
 		if (!adviserHint || !adviserSelect) {
 			return;
@@ -156,6 +171,12 @@ function initRegisterForm() {
 	filterAdvisers();
 }
 
+// ── Booking Slot Picker ───────────────────────────────────────────────────────
+// Handles the date + time-slot picker on the booking creation page.
+// When the student changes the date, it fetches available 30-minute slots from
+// the server and renders them as clickable buttons. The chosen slot's ISO
+// datetime is written into a hidden input for form submission.
+
 function initBookingSlotPicker() {
 	const slotPicker = document.getElementById('bookingSlotPicker');
 
@@ -182,6 +203,7 @@ function initBookingSlotPicker() {
 	const initialDate = oldDate || minDate;
 	dateInput.value = initialDate;
 
+	// Highlights the selected slot button and writes its value to the hidden input.
 	const setSelectedSlot = (isoDateTime) => {
 		preferredDateTimeInput.value = isoDateTime;
 
@@ -190,6 +212,7 @@ function initBookingSlotPicker() {
 		});
 	};
 
+	// Clears the slot grid and re-renders buttons for each slot returned by the API.
 	const renderSlots = (slots, adviserName) => {
 		slotGrid.innerHTML = '';
 
@@ -227,6 +250,7 @@ function initBookingSlotPicker() {
 		}
 	};
 
+	// Fetches available slots for a given date string (YYYY-MM-DD) from the server.
 	const loadSlots = async (dateValue) => {
 		slotGrid.innerHTML = '<p class="booking-slot-loading">Loading slots...</p>';
 
@@ -264,8 +288,10 @@ function initBookingSlotPicker() {
 	loadSlots(initialDate);
 }
 
-// ── Mobile navigation toggle ─────────────────────────────────────────────────
-// Wait until the DOM is ready before attaching event listeners.
+// ── DOM Ready — Init & Mobile Navigation ──────────────────────────────────────
+// Entry point: initialises all page features once the DOM is ready.
+// Also handles the mobile hamburger menu and dropdown mega-menus in the navbar.
+
 document.addEventListener('DOMContentLoaded', function () {
 	initRegisterForm();
 	initBookingSlotPicker();
